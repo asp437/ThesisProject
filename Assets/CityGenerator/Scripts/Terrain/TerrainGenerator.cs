@@ -26,7 +26,7 @@ public class TerrainGenerator : MonoBehaviour {
         return noise;
     }
 
-    public void GenerateTerrain(int seed, GameObject inTerrainObject) {
+    public float[,] GenerateTerrain(int seed, GameObject inTerrainObject) {
         if (inTerrainObject != null) {
             terrainObject = inTerrainObject;
         }
@@ -63,6 +63,7 @@ public class TerrainGenerator : MonoBehaviour {
                 terrainMap[x, y] = r;
             }
         meshGenerator.GenerateMesh(terrainObject, terrainMap, meshDimension);
+        return terrainMap;
     }
 
     public GameObject GetTerrainObject() {
