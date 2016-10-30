@@ -41,7 +41,7 @@ public class RoadNetwork {
         roadSegments = new List<RoadSegment>();
         crossroads = new List<Crossroad>();
 
-
+        /*
         Crossroad cr0 = new Crossroad(), cr1 = new Crossroad(), cr2 = new Crossroad(), cr3 = new Crossroad(), cr4 = new Crossroad();
         RoadSegment segment0 = new RoadSegment(), segment1 = new RoadSegment(), segment2 = new RoadSegment(), segment3 = new RoadSegment();
         cr0.x = 32; cr0.y = 32;
@@ -68,6 +68,7 @@ public class RoadNetwork {
         crossroads.Add(cr2);
         crossroads.Add(cr3);
         crossroads.Add(cr4);
+        */
     }
 
     // Use this for initialization

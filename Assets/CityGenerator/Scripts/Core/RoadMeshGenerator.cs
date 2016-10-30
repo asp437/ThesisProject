@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class RoadMeshGenerator : MonoBehaviour {
-    public const float scaleMultiplier = 0.3f;
+    public const float scaleMultiplier = 0.1f;
     private const int verticesPerCross = 4;
     private TerrainMeshGenerator _terrainMeshGenerator;
 
