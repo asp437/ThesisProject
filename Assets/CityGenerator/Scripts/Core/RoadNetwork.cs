@@ -42,24 +42,32 @@ public class RoadNetwork {
         crossroads = new List<Crossroad>();
 
 
-        Crossroad cr0 = new Crossroad(), cr1 = new Crossroad(), cr2 = new Crossroad();
-        RoadSegment segment0 = new RoadSegment(), segment1 = new RoadSegment(), segment2 = new RoadSegment();
-        cr0.x = 0; cr0.y = 0;
-        cr1.x = 64; cr1.y = 0;
+        Crossroad cr0 = new Crossroad(), cr1 = new Crossroad(), cr2 = new Crossroad(), cr3 = new Crossroad(), cr4 = new Crossroad();
+        RoadSegment segment0 = new RoadSegment(), segment1 = new RoadSegment(), segment2 = new RoadSegment(), segment3 = new RoadSegment();
+        cr0.x = 32; cr0.y = 32;
+        cr1.x = 0; cr1.y = 0;
         cr2.x = 32; cr2.y = 64;
-        segment0.setStart(cr0);
-        segment0.setEnd(cr1);
-        segment1.setStart(cr1);
-        segment1.setEnd(cr2);
-        segment2.setStart(cr2);
+        cr3.x = 0; cr3.y = 32;
+        cr4.x = 64; cr4.y = 64;
+
+        segment0.setStart(cr1);
+        segment0.setEnd(cr0);
+        segment1.setStart(cr2);
+        segment1.setEnd(cr0);
+        segment2.setStart(cr3);
         segment2.setEnd(cr0);
+        segment3.setStart(cr4);
+        segment3.setEnd(cr0);
 
         roadSegments.Add(segment0);
         roadSegments.Add(segment1);
         roadSegments.Add(segment2);
+        roadSegments.Add(segment3);
         crossroads.Add(cr0);
         crossroads.Add(cr1);
         crossroads.Add(cr2);
+        crossroads.Add(cr3);
+        crossroads.Add(cr4);
     }
 
     // Use this for initialization

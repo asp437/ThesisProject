@@ -7,13 +7,14 @@ public class CityGenerator : MonoBehaviour {
     public RoadNetwork roadNetwork;
     public int terrainGeneratorSeed;
     public AbstractAgent[] agentsList;
+    public int meshDimension;
 
     // Use this for initialization
     void Start () {
-        float[,] terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null);
+        float[,] terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
         roadNetwork = new RoadNetwork();
-        roadMeshGenerator = new RoadMeshGenerator();
-        roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, terrainMap);
+        roadMeshGenerator = new RoadMeshGenerator(terrainGenerator.meshGenerator);
+        roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, terrainMap, meshDimension);
 	}
 	
 	// Update is called once per frame

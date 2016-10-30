@@ -10,7 +10,6 @@ public class TerrainGenerator : MonoBehaviour {
     private int[] permutationTable; // Permutation table used for determined pseudorandom values generation
     public TerrainMeshGenerator meshGenerator;
     public int dimension;
-    public int meshDimension;
     public List<NoiseConfiguration> noisesConfigurations; // Noise configuration
 
     // Functon for generation of noise with given frequency multiplier
@@ -26,7 +25,7 @@ public class TerrainGenerator : MonoBehaviour {
         return noise;
     }
 
-    public float[,] GenerateTerrain(int seed, GameObject inTerrainObject) {
+    public float[,] GenerateTerrain(int seed, GameObject inTerrainObject, CityGenerator generator) {
         if (inTerrainObject != null) {
             terrainObject = inTerrainObject;
         }
@@ -62,7 +61,7 @@ public class TerrainGenerator : MonoBehaviour {
                 r = MathHelper.quintic(MathHelper.quintic(r)); // Apply non-linear filter
                 terrainMap[x, y] = r;
             }
-        meshGenerator.GenerateMesh(terrainObject, terrainMap, meshDimension);
+        meshGenerator.GenerateMesh(terrainObject, terrainMap, generator.meshDimension);
         return terrainMap;
     }
 

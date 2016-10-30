@@ -22,16 +22,21 @@ public class TerrainMeshGenerator : MonoBehaviour {
         return diffuse;
     }
 
+    public float getPointHeight(int x, int y, int dimension, float[,] terrainMap) {
+        float step = terrainMap.GetLength(0) * 1.0f / dimension;
+        return meshExponentFactor* Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
+    }
+
     public void GenerateMesh(GameObject terrainObject, float[,] terrainMap, int dimension) {
         Mesh mesh = new Mesh();
-        float step = terrainMap.GetLength(0) * 1.0f / dimension;
         Vector3[] vertices = new Vector3[dimension * dimension]; // Vertices matrix
         Vector2[] uvs = new Vector2[dimension * dimension]; // UV texture coordiantes for each vertex
         List<int> indices = new List<int>(); // Indices of each edge
                                              // Generation of vertices matrix
+        float step = terrainMap.GetLength(0) * 1.0f / dimension;
         for (int x = 0; x < dimension; x++) {
             // Use filter function in order to generate more feasible terrain
-            float h = meshExponentFactor * Mathf.Pow(meshFactor * terrainMap[(int)(x * step), 0], meshExponentPower);
+            float h = getPointHeight(x, 0, dimension, terrainMap);
             vertices[x] = new Vector3(x, h, 0);
             uvs[x] = new Vector2(x * 1.0f / dimension, 0 * 1.0f / dimension);
         }
@@ -39,7 +44,7 @@ public class TerrainMeshGenerator : MonoBehaviour {
         for (int i = dimension; i < dimension * dimension; i++) {
             int x = i % dimension;
             int y = i / dimension;
-            float h = meshExponentFactor * Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
+            float h = getPointHeight(x, y, dimension, terrainMap);
             vertices[i] = new Vector3(x, h, y);
             uvs[i] = new Vector2(x * 1.0f / dimension, y * 1.0f / dimension);
             if (x == 0) {
