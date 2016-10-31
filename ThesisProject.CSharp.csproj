@@ -75,9 +75,9 @@
     <Compile Include="Assets\CityGenerator\Scripts\Core\AbstractAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\CityGenerator.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\MathHelper.cs" />
-    <Compile Include="Assets\CityGenerator\Scripts\Core\RoadHelper.cs" />
-    <Compile Include="Assets\CityGenerator\Scripts\Core\RoadMeshGenerator.cs" />
-    <Compile Include="Assets\CityGenerator\Scripts\Core\RoadNetwork.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Roads\RoadHelper.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Roads\RoadMeshGenerator.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Roads\RoadNetwork.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Terrain\TerrainGenerator.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Terrain\TerrainMeshGenerator.cs" />
   </ItemGroup>
