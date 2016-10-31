@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class RoadMeshGenerator : MonoBehaviour {
-    public const float scaleMultiplier = 0.1f;
+    public const float scaleMultiplier = 0.015f;
     private const int verticesPerCross = 4;
     private const float heightScale = 0.25f;
     private TerrainMeshGenerator _terrainMeshGenerator;
@@ -103,10 +103,10 @@ public class RoadMeshGenerator : MonoBehaviour {
             vertices.Add(v1);
             vertices.Add(v2);
             vertices.Add(v3);
-            indices.Add(verticesPerCross * i);
-            indices.Add(verticesPerCross * i + 1);
             indices.Add(verticesPerCross * i + 2);
             indices.Add(verticesPerCross * i + 3);
+            indices.Add(verticesPerCross * i);
+            indices.Add(verticesPerCross * i + 1);
         }
         for (int i = 0; i < roadNetwork.roadSegments.Count; i++) {
             int s = roadNetwork.crossroads.IndexOf(roadNetwork.roadSegments[i].start);
@@ -119,8 +119,8 @@ public class RoadMeshGenerator : MonoBehaviour {
         reversedIndices.Reverse();
         indices.AddRange(reversedIndices);
         mesh.SetIndices(indices.ToArray(), MeshTopology.Quads, 0);
-        // mesh.RecalculateNormals();
-        // mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
         if (gameObject.GetComponent<MeshFilter>() == null) {
             gameObject.AddComponent<MeshFilter>();
         }

@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class RoadExtenderAgent : AbstractAgent {
-    private const float scale = 1.0f;
+    private const float scale = 0.2f;
     public override void agentAction() {
         RoadNetwork network = generator.roadNetwork;
         Crossroad cr0 = network.crossroads[Random.Range(0, network.crossroads.Count - 1)];
@@ -32,6 +32,24 @@ public class RoadExtenderAgent : AbstractAgent {
                 return;
         }
 
+        // TODO: Improve blocking creation of road close to some parallel roads
+        Crossroad testCr = new Crossroad(), testCr1 = new Crossroad();
+        testCr.x = cr0.x + dir.x * 5 + dir.y * 5;
+        testCr.y = cr0.y + dir.y * 5 + dir.x * 5;
+
+        testCr1.x = cr0.x + dir.x * 5;
+        testCr1.y = cr0.y + dir.y * 5;
+
+        for (int i = 0; i < network.roadSegments.Count; i++)
+            if (RoadHelper.intersects(testCr1, testCr, network.roadSegments[i].start, network.roadSegments[i].end))
+                return;
+
+        testCr.x = cr0.x + dir.x * 5 + dir.y * -5;
+        testCr.y = cr0.y + dir.y * 5 + dir.x * -5;
+        for (int i = 0; i < network.roadSegments.Count; i++)
+            if (RoadHelper.intersects(testCr1, testCr, network.roadSegments[i].start, network.roadSegments[i].end))
+                return;
+
         Crossroad testCrossroad = new Crossroad();
         testCrossroad.x = cr0.x + dir.x * count;
         testCrossroad.y = cr0.y + dir.y * count;
@@ -55,6 +73,24 @@ public class RoadExtenderAgent : AbstractAgent {
             segment.setEnd(cr1);
             network.roadSegments.Add(segment);
             old_cr1 = cr1;
+        }
+        testCr = new Crossroad();
+        testCr.x = old_cr1.x + dir.x * 5;
+        testCr.y = old_cr1.y + dir.y * 5;
+
+        for (int i = 0; i < network.roadSegments.Count; i++) {
+            if (RoadHelper.intersects(old_cr1, testCr, network.roadSegments[i].start, network.roadSegments[i].end))
+            {
+                RoadSegment segment = new RoadSegment();
+                segment.setStart(old_cr1);
+                if (Vector2.Distance(new Vector2(old_cr1.x, old_cr1.y), new Vector2(network.roadSegments[i].start.x, network.roadSegments[i].start.y)) < 
+                    Vector2.Distance(new Vector2(old_cr1.x, old_cr1.y), new Vector2(network.roadSegments[i].end.x, network.roadSegments[i].end.y)))
+                    segment.setEnd(network.roadSegments[i].start);
+                else
+                    segment.setEnd(network.roadSegments[i].end);
+                network.roadSegments.Add(segment);
+                break;
+            }
         }
     }
 }
