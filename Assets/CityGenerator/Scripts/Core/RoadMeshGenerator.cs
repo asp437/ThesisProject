@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class RoadMeshGenerator : MonoBehaviour {
     public const float scaleMultiplier = 0.1f;
     private const int verticesPerCross = 4;
+    private const float heightScale = 0.25f;
     private TerrainMeshGenerator _terrainMeshGenerator;
 
     public RoadMeshGenerator(TerrainMeshGenerator terrainMeshGenerator) {
@@ -23,7 +24,11 @@ public class RoadMeshGenerator : MonoBehaviour {
             x_i = dimension - 1;
         if (y_i >= dimension)
             y_i = dimension - 1;
-        return _terrainMeshGenerator.getPointHeight(x_i, y_i, dimension, terrainMap);
+        if (x_i < 0)
+            x_i = 0;
+        if (y_i < 0)
+            y_i = 0;
+        return _terrainMeshGenerator.getPointHeight(x_i, y_i, dimension, terrainMap) + 1.0f * heightScale;
     }
 
     protected void connectClosest(List<Vector3> vertices, List<int> indices, int s, int e) {

@@ -24,7 +24,7 @@ public class TerrainMeshGenerator : MonoBehaviour {
 
     public float getPointHeight(int x, int y, int dimension, float[,] terrainMap) {
         float step = terrainMap.GetLength(0) * 1.0f / dimension;
-        return meshExponentFactor* Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
+        return heightScale * meshExponentFactor* Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
     }
 
     public void GenerateMesh(GameObject terrainObject, float[,] terrainMap, int dimension) {
