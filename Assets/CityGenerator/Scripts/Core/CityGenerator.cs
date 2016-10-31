@@ -26,8 +26,7 @@ public class CityGenerator : MonoBehaviour {
                 agentsList[i].agent.agentAction();
             }
         }
-
-        roadMeshGenerator = new RoadMeshGenerator(terrainGenerator.meshGenerator);
+        roadMeshGenerator.terrainMeshGenerator = terrainGenerator.meshGenerator;
         roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, terrainMap, meshDimension);
 	}
 	

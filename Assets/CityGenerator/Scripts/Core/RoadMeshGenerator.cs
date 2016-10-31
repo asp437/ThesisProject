@@ -4,31 +4,29 @@ using System.Collections.Generic;
 
 public class RoadMeshGenerator : MonoBehaviour {
     public const float scaleMultiplier = 0.015f;
+    public Material roadMaterial;
     private const int verticesPerCross = 4;
-    private const float heightScale = 0.25f;
-    private TerrainMeshGenerator _terrainMeshGenerator;
-
-    public RoadMeshGenerator(TerrainMeshGenerator terrainMeshGenerator) {
-	    _terrainMeshGenerator = terrainMeshGenerator;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    private const float heightScale = 0.005f;
+    public TerrainMeshGenerator terrainMeshGenerator;
 
     protected float getPointHeight(float x, float y, int dimension, float[,] terrainMap) {
         int x_i = (int)x;
         int y_i = (int)y;
-        if (x_i >= dimension)
-            x_i = dimension - 1;
-        if (y_i >= dimension)
-            y_i = dimension - 1;
+        if (x_i >= dimension - 1)
+            x_i = dimension - 2;
+        if (y_i >= dimension - 1)
+            y_i = dimension - 2;
         if (x_i < 0)
             x_i = 0;
         if (y_i < 0)
             y_i = 0;
-        return _terrainMeshGenerator.getPointHeight(x_i, y_i, dimension, terrainMap) + 1.0f * heightScale;
+        float h0 = terrainMeshGenerator.getPointHeight(x_i, y_i, dimension, terrainMap) + 1.0f * heightScale;
+        float h1 = terrainMeshGenerator.getPointHeight(x_i + 1, y_i, dimension, terrainMap) + 1.0f * heightScale;
+        float h2 = terrainMeshGenerator.getPointHeight(x_i, y_i + 1, dimension, terrainMap) + 1.0f * heightScale;
+        float h3 = terrainMeshGenerator.getPointHeight(x_i + 1, y_i + 1, dimension, terrainMap) + 1.0f * heightScale;
+        h0 = MathHelper.lerp(h0, h1, x - x_i);
+        h2 = MathHelper.lerp(h2, h3, x - x_i);
+        return MathHelper.lerp(h0, h2, y - y_i);
     }
 
     protected void connectClosest(List<Vector3> vertices, List<int> indices, int s, int e) {
@@ -85,19 +83,19 @@ public class RoadMeshGenerator : MonoBehaviour {
             float z = getPointHeight(roadNetwork.crossroads[i].x, roadNetwork.crossroads[i].y, dimension, terrainMap);
             v0.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
             v0.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
-            v0.y = z;
+            v0.y = getPointHeight(v0.x, v0.z, dimension, terrainMap);
 
             v1.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
             v1.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
-            v1.y = z;
+            v1.y = getPointHeight(v1.x, v1.z, dimension, terrainMap);
 
             v2.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
             v2.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
-            v2.y = z;
+            v2.y = getPointHeight(v2.x, v2.z, dimension, terrainMap);
 
             v3.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
             v3.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
-            v3.y = z;
+            v3.y = getPointHeight(v3.x, v3.z, dimension, terrainMap);
 
             vertices.Add(v0);
             vertices.Add(v1);
@@ -128,5 +126,6 @@ public class RoadMeshGenerator : MonoBehaviour {
             gameObject.AddComponent<MeshRenderer>();
         }
         ((MeshFilter)(gameObject.GetComponent<MeshFilter>())).mesh = mesh;
+        ((MeshRenderer)(gameObject.GetComponent<MeshRenderer>())).material = roadMaterial;
     }
 }
