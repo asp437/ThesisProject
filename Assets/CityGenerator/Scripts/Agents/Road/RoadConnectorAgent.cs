@@ -6,7 +6,7 @@ public class RoadConnectorAgent : AbstractAgent {
 
     protected bool hasIntersections(RoadNetwork network, Crossroad cr0, Crossroad cr1) {
         for (int i = 0; i < network.roadSegments.Count; i++) {
-            if (RoadHelper.intersects(cr0, cr1, network.roadSegments[i].start, network.roadSegments[i].end))
+            if (RoadHelper.areRoadsIntersects(new RoadSegment(cr0, cr1), network.roadSegments[i]))
                 return true;
         }
         return false;
@@ -24,7 +24,7 @@ public class RoadConnectorAgent : AbstractAgent {
             }
             cr0 = network.crossroads[Random.Range(0, network.crossroads.Count - 1)];
         }
-        for (int i = 0; i < network.crossroads.Count; i++) {
+        for (int i = 0; i < network.crossroads.Count; i++) { // Not guarantee checking all possible crossrods
             if (cr1.adjacentSegemnts.Count < 2 && cr1 != cr0 && !hasIntersections(network, cr0, cr1)) {
                 cr1_founded = true;
                 break;
@@ -43,33 +43,11 @@ public class RoadConnectorAgent : AbstractAgent {
             return;
         }
 
-        if (Vector2.Distance(v0, v1) > 1.0f * scale) {
-            dir.Normalize();
-            dir *= scale;
-            Vector2 v2 = dir + v0;
-            Crossroad old_cr2 = cr0;
-            RoadSegment segment;
-            while (Vector2.Distance(v2, v1) > 1.0f * scale) {
-                segment = new RoadSegment();
-                Crossroad cr2 = new Crossroad();
-                cr2.x = v2.x;
-                cr2.y = v2.y;
-                network.crossroads.Add(cr2);
-                segment.setStart(old_cr2);
-                segment.setEnd(cr2);
-                network.roadSegments.Add(segment);
-                v2 = v2 + dir;
-                old_cr2 = cr2;
-            }
-            segment = new RoadSegment();
-            segment.setStart(old_cr2);
-            segment.setEnd(cr1);
-            network.roadSegments.Add(segment);
-        } else {
-            RoadSegment segment = new RoadSegment();
-            segment.setStart(cr0);
-            segment.setEnd(cr1);
-            network.roadSegments.Add(segment);
-        }
+        RoadSegment segment = new RoadSegment(cr0, cr1);
+        for (int i = 0; i < network.roadSegments.Count; i++)
+            if (RoadHelper.areRoadsIntersects(segment, network.roadSegments[i]))
+                return;
+
+        network.roadSegments.Add(segment);
     }
 }

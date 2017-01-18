@@ -10,6 +10,13 @@ public class Crossroad {
     public Crossroad() {
         adjacentSegemnts = new List<RoadSegment>();
     }
+
+    public Crossroad(float x, float y)
+    {
+        adjacentSegemnts = new List<RoadSegment>();
+        this.x = x;
+        this.y = y;
+    }
 }
 
 public class RoadSegment {
@@ -17,6 +24,18 @@ public class RoadSegment {
     public Crossroad end;
     public int type; // TODO: Create enum with road types
     public float width;
+
+    public RoadSegment(Crossroad start, Crossroad end)
+    {
+        this.start = start;
+        this.end = end;
+        width = 0.5f;
+    }
+
+    public RoadSegment()
+    {
+        width = 0.5f;
+    }
 
     public void setStart(Crossroad cr) {
         if (start != null)
