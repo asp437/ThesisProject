@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RoadExtenderAgent : AbstractAgent {
+public class RoadExtenderAgent : AbstractAgent
+{
     private const float scale = 0.2f;
-    public override void agentAction() {
+    public override void agentAction()
+    {
         RoadNetwork network = generator.roadNetwork;
         Crossroad extensionOrigin = network.crossroads[Random.Range(0, network.crossroads.Count - 1)];
         Vector2 extensionDirection;
         RoadSegment segment;
-        switch (Random.Range(0, 3)) {
+        switch (Random.Range(0, 3))
+        {
             case 0: // Right
                 extensionDirection = new Vector2(0, 1);
                 break;
@@ -25,23 +28,25 @@ public class RoadExtenderAgent : AbstractAgent {
         }
         extensionDirection *= Random.Range(0.4f, 20.0f) * scale;
 
-        for (int i = 0; i < extensionOrigin.adjacentSegemnts.Count; i++) {
+        for (int i = 0; i < extensionOrigin.adjacentSegemnts.Count; i++)
+        {
             Crossroad anotherCr = extensionOrigin.adjacentSegemnts[i].end == extensionOrigin ? extensionOrigin.adjacentSegemnts[i].start : extensionOrigin.adjacentSegemnts[i].end;
-            Vector2 v0 = new Vector2(extensionDirection.x, extensionDirection.y), v1 = new Vector2(anotherCr.x - extensionOrigin.x, anotherCr.y  - extensionOrigin.y);
+            Vector2 v0 = new Vector2(extensionDirection.x, extensionDirection.y), v1 = new Vector2(anotherCr.x - extensionOrigin.x, anotherCr.y - extensionOrigin.y);
             if (Vector2.Angle(v0, v1) < 1)
                 return;
         }
-        
+
         Crossroad testCr = new Crossroad();
         testCr.x = extensionOrigin.x + extensionDirection.x;
         testCr.y = extensionOrigin.y + extensionDirection.y;
-        for (int i = 0; i < network.roadSegments.Count; i++) {
+        for (int i = 0; i < network.roadSegments.Count; i++)
+        {
             if (network.roadSegments[i].start == extensionOrigin || network.roadSegments[i].end == extensionOrigin)
                 continue;
             if (RoadHelper.areRoadsIntersects(new RoadSegment(extensionOrigin, testCr), network.roadSegments[i]))
                 return;
         }
-        
+
         Crossroad cr1 = new Crossroad(extensionOrigin.x + extensionDirection.x, extensionOrigin.y + extensionDirection.y);
         if (cr1.x > generator.meshDimension - 1 || cr1.x < 1 || cr1.y > generator.meshDimension - 1 || cr1.y < 1)
             return;
@@ -66,7 +71,8 @@ public class RoadExtenderAgent : AbstractAgent {
                 segment.setStart(cr1);
                 segment.setEnd(testCr);
                 network.roadSegments.Add(segment);
-                return;
+                Debug.Log("fajsdf");
+                break;
             }
         }
     }

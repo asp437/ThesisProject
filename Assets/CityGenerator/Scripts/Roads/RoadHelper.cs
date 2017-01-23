@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
-public class RoadHelper {
+public class RoadHelper
+{
     public static float crossroadRoadOffset = 0.1f;
 
 
     // Line segment intersection algorithm by Bryce Boe
     // More info: http://bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
-    protected static bool ccw(Crossroad A, Crossroad B, Crossroad C) {
+    protected static bool ccw(Crossroad A, Crossroad B, Crossroad C)
+    {
         return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
     }
 
@@ -21,8 +24,9 @@ public class RoadHelper {
     {
         return ccw(a, c, d) != ccw(b, c, d) && ccw(a, b, c) != ccw(a, b, d);
     }
-    
-    public static bool areRoadsIntersects(RoadSegment rs0, RoadSegment rs1) {
+
+    public static bool areRoadsIntersects(RoadSegment rs0, RoadSegment rs1)
+    {
         bool lineIntersection = ccw(rs0.start, rs1.start, rs1.end) != ccw(rs0.end, rs1.start, rs1.end) && ccw(rs0.start, rs0.end, rs1.start) != ccw(rs0.start, rs0.end, rs1.end);
         if (lineIntersection)
             return true;
@@ -41,7 +45,8 @@ public class RoadHelper {
         return false;
     }
 
-    public static Vector2[] getRoadOffsetVectors(Crossroad main, Crossroad other, float width) {
+    public static Vector2[] getRoadOffsetVectors(Crossroad main, Crossroad other, float width)
+    {
         Vector2[] result = new Vector2[2];
         Vector3 pointA = new Vector3(main.x, 0, main.y);
         Vector3 pointB = new Vector3(other.x, 0, other.y);
@@ -73,7 +78,9 @@ public class RoadHelper {
         if (Math.Abs(f) < 0.01)
         {
             return Vector2.zero;
-        } else {
+        }
+        else
+        {
             float tmp0 = a.x * b.y - a.y * b.x;
             float tmp1 = c.x * d.y - c.y * d.x;
 

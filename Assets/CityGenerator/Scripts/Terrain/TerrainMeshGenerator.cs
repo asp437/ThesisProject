@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class TerrainMeshGenerator : MonoBehaviour {
+public class TerrainMeshGenerator : MonoBehaviour
+{
     public float heightScale = 512;
     // Mesh generator filter function parameters
     public float meshExponentFactor = 30.0f;
@@ -10,11 +11,14 @@ public class TerrainMeshGenerator : MonoBehaviour {
     public float meshExponentPower = 2.0f;
     public Gradient gradient;
 
-    public Texture2D GenerateDiffuseMap(float[,] terrainMap) {
+    public Texture2D GenerateDiffuseMap(float[,] terrainMap)
+    {
         int dimension = terrainMap.GetLength(0);
         Texture2D diffuse = new Texture2D(dimension, dimension);
-        for (int x = 0; x < dimension; x++) {
-            for (int y = 0; y < dimension; y++) {
+        for (int x = 0; x < dimension; x++)
+        {
+            for (int y = 0; y < dimension; y++)
+            {
                 diffuse.SetPixel(x, y, gradient.Evaluate(terrainMap[x, y]));
             }
         }
@@ -22,40 +26,49 @@ public class TerrainMeshGenerator : MonoBehaviour {
         return diffuse;
     }
 
-    public float getPointHeight(int x, int y, int dimension, float[,] terrainMap) {
+    public float getPointHeight(int x, int y, int dimension, float[,] terrainMap)
+    {
         float step = terrainMap.GetLength(0) * 1.0f / dimension;
-        return heightScale * meshExponentFactor* Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
+        return heightScale * meshExponentFactor * Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
     }
 
-    public void GenerateMesh(GameObject terrainObject, float[,] terrainMap, int dimension) {
+    public void GenerateMesh(GameObject terrainObject, float[,] terrainMap, int dimension)
+    {
         Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[dimension * dimension]; // Vertices matrix
         Vector2[] uvs = new Vector2[dimension * dimension]; // UV texture coordiantes for each vertex
         List<int> indices = new List<int>(); // Indices of each edge
                                              // Generation of vertices matrix
         float step = terrainMap.GetLength(0) * 1.0f / dimension;
-        for (int x = 0; x < dimension; x++) {
+        for (int x = 0; x < dimension; x++)
+        {
             // Use filter function in order to generate more feasible terrain
             float h = getPointHeight(x, 0, dimension, terrainMap);
             vertices[x] = new Vector3(x, h, 0);
             uvs[x] = new Vector2(x * 1.0f / dimension, 0 * 1.0f / dimension);
         }
         // Generation of edges
-        for (int i = dimension; i < dimension * dimension; i++) {
+        for (int i = dimension; i < dimension * dimension; i++)
+        {
             int x = i % dimension;
             int y = i / dimension;
             float h = getPointHeight(x, y, dimension, terrainMap);
             vertices[i] = new Vector3(x, h, y);
             uvs[i] = new Vector2(x * 1.0f / dimension, y * 1.0f / dimension);
-            if (x == 0) {
+            if (x == 0)
+            {
                 indices.Add(i - dimension);
                 indices.Add(i);
                 indices.Add(i - dimension + 1);
-            } else if (x == dimension - 1) {
+            }
+            else if (x == dimension - 1)
+            {
                 indices.Add(i - dimension);
                 indices.Add(i - 1);
                 indices.Add(i);
-            } else {
+            }
+            else
+            {
                 indices.Add(i - dimension);
                 indices.Add(i - 1);
                 indices.Add(i);
@@ -69,13 +82,16 @@ public class TerrainMeshGenerator : MonoBehaviour {
         mesh.SetUVs(0, new List<Vector2>(uvs));
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
-        if (terrainObject.GetComponent<MeshFilter>() == null) {
+        if (terrainObject.GetComponent<MeshFilter>() == null)
+        {
             terrainObject.AddComponent<MeshFilter>();
         }
-        if (terrainObject.GetComponent<MeshRenderer>() == null){
+        if (terrainObject.GetComponent<MeshRenderer>() == null)
+        {
             terrainObject.AddComponent<MeshRenderer>();
         }
-        if (terrainObject.GetComponent<MeshCollider>() == null) {
+        if (terrainObject.GetComponent<MeshCollider>() == null)
+        {
             terrainObject.AddComponent<MeshCollider>();
         }
         ((MeshFilter)(terrainObject.GetComponent<MeshFilter>())).mesh = mesh;

@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class TerrainGenerator : MonoBehaviour {
+public class TerrainGenerator : MonoBehaviour
+{
     [System.Serializable]
     public struct NoiseConfiguration { public int amplitude; public float frequency; }
 
@@ -13,10 +14,12 @@ public class TerrainGenerator : MonoBehaviour {
     public List<NoiseConfiguration> noisesConfigurations; // Noise configuration
 
     // Functon for generation of noise with given frequency multiplier
-    float[,] generateNoise(float mult) {
+    float[,] generateNoise(float mult)
+    {
         float[,] noise = new float[dimension, dimension];
         for (int x = 0; x < dimension; x++)
-            for (int y = 0; y < dimension; y++) {
+            for (int y = 0; y < dimension; y++)
+            {
                 float r = PerlinNoise(new Vector2(x * mult / dimension, y * mult / dimension));
                 r = (r + 1.0f) / 2.0f;
                 noise[x, y] = r;
@@ -25,36 +28,44 @@ public class TerrainGenerator : MonoBehaviour {
         return noise;
     }
 
-    public float[,] GenerateTerrain(int seed, GameObject inTerrainObject, CityGenerator generator) {
-        if (inTerrainObject != null) {
+    public float[,] GenerateTerrain(int seed, GameObject inTerrainObject, CityGenerator generator)
+    {
+        if (inTerrainObject != null)
+        {
             terrainObject = inTerrainObject;
         }
-        if (terrainObject == null) {
+        if (terrainObject == null)
+        {
             terrainObject = new GameObject();
         }
         float[,] terrainMap = new float[dimension, dimension];
         Random.InitState(seed);
         int permutationTableSize = (dimension + 1) * (dimension + 1);
         permutationTable = new int[permutationTableSize];
-        for (int i = 0; i < permutationTableSize; i++) {
+        for (int i = 0; i < permutationTableSize; i++)
+        {
             permutationTable[i] = ((int)(Random.value * Mathf.Pow(2, 30)));
         }
 
         List<float> amplitudes = new List<float>();
         List<float[,]> noises = new List<float[,]>();
-        for (int i = 0; i < noisesConfigurations.Count; i++) {
+        for (int i = 0; i < noisesConfigurations.Count; i++)
+        {
             noises.Add(generateNoise(noisesConfigurations[i].frequency));
             amplitudes.Add(noisesConfigurations[i].amplitude);
         }
 
         float totalAmplitude = 0.0f;
-        for (int i = 0; i < noises.Count; i++) {
+        for (int i = 0; i < noises.Count; i++)
+        {
             totalAmplitude += amplitudes[i];
         }
         for (int x = 0; x < dimension; x++)
-            for (int y = 0; y < dimension; y++) {
+            for (int y = 0; y < dimension; y++)
+            {
                 float r = 0.0f;
-                for (int i = 0; i < noises.Count; i++) {
+                for (int i = 0; i < noises.Count; i++)
+                {
                     r += noises[i][x, y] * amplitudes[i];
                 }
                 r = r / totalAmplitude; // Normalize sum of noises
@@ -65,18 +76,21 @@ public class TerrainGenerator : MonoBehaviour {
         return terrainMap;
     }
 
-    public GameObject GetTerrainObject() {
+    public GameObject GetTerrainObject()
+    {
         return terrainObject;
     }
 
     // Get pseudorandom gradient for each keypoint of the noise
-    Vector2 getRandomGradient(int x, int y) {
+    Vector2 getRandomGradient(int x, int y)
+    {
         Random.InitState(permutationTable[x * dimension + y]);
         Vector2 result = new Vector2((Random.value - 0.5f) * 2.0f, (Random.value - 0.5f) * 2.0f);
         return result.normalized;
     }
 
-    private float PerlinNoise(Vector2 vec) {
+    private float PerlinNoise(Vector2 vec)
+    {
         // Calculate position of nearest keypoint in up/left direction and distance in quad
         int left = Mathf.FloorToInt(vec.x), top = Mathf.FloorToInt(vec.y);
         Vector2 positionInQuad = new Vector2(vec.x - left, vec.y - top);
