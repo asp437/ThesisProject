@@ -87,4 +87,18 @@ public class RoadHelper
             return new Vector2((tmp0 * x34 - tmp1 * x12) / f, (tmp0 * y34 - tmp1 * y12) / f);
         }
     }
+
+    public static bool isUnderWaterline(Crossroad crossroad, CityGenerator cityGenerator)
+    {
+        return cityGenerator.getPointHeight(crossroad.x, crossroad.y) <= cityGenerator.terrainGenerator.meshGenerator.scaleHeight(cityGenerator.waterlineHeight);
+    }
+
+    public static float getSegmentSlope(Crossroad cr0, Crossroad cr1, CityGenerator cityGenerator)
+    {
+        float startHeight = cityGenerator.getPointHeight(cr0.x, cr0.y);
+        float endHeight = cityGenerator.getPointHeight(cr1.x, cr1.y);
+        float segmentLength = (float)Math.Sqrt(Math.Pow(Math.Abs(cr0.x - cr1.x), 2) + Math.Pow(Math.Abs(cr0.y - cr1.y), 2));
+        float slope = (float)(Math.Atan(Math.Abs(startHeight - endHeight) / segmentLength) * (180.0f / Math.PI));
+        return float.IsNaN(slope) ? 0.0f : slope;
+    }
 }

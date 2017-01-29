@@ -51,13 +51,15 @@ public class RoadExtenderAgent : AbstractAgent
         Crossroad cr1 = new Crossroad(extensionOrigin.x + extension.x, extensionOrigin.y + extension.y);
         if (cr1.x > generator.meshDimension - 1 || cr1.x < 1 || cr1.y > generator.meshDimension - 1 || cr1.y < 1)
             return;
+        if (RoadHelper.isUnderWaterline(cr1, generator) || RoadHelper.getSegmentSlope(extensionOrigin, cr1, generator) >= generator.maximumSlope)
+            return;
         network.crossroads.Add(cr1);
         segment = new RoadSegment(extensionOrigin, cr1);
         network.roadSegments.Add(segment);
         // return;
         testCr = new Crossroad();
-        testCr.x = cr1.x + direction.x * 3; // TODO: Apply some scale?
-        testCr.y = cr1.y + direction.y * 3; // TODO: Apply some scale?
+        testCr.x = cr1.x + direction.x * 5;
+        testCr.y = cr1.y + direction.y * 5;
         segment = new RoadSegment(cr1, testCr);
 
         for (int i = 0; i < network.roadSegments.Count; i++)
@@ -78,6 +80,8 @@ public class RoadExtenderAgent : AbstractAgent
                     continue;
 
                 testCr = new Crossroad(intersectionPoint.x, intersectionPoint.y);
+                if (RoadHelper.isUnderWaterline(testCr, generator) || RoadHelper.getSegmentSlope(cr1, testCr, generator) >= generator.maximumSlope) //  
+                    return;
                 network.crossroads.Add(testCr);
                 segment = new RoadSegment(cr1, testCr);
                 network.roadSegments.Add(segment);

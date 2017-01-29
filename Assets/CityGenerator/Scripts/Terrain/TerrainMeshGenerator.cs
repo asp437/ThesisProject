@@ -32,6 +32,11 @@ public class TerrainMeshGenerator : MonoBehaviour
         return heightScale * meshExponentFactor * Mathf.Pow(meshFactor * terrainMap[(int)(x * step), (int)(y * step)], meshExponentPower);
     }
 
+    public float scaleHeight(float height)
+    {
+        return heightScale * meshExponentFactor * Mathf.Pow(meshFactor * height, meshExponentPower);
+    }
+
     public void GenerateMesh(GameObject terrainObject, float[,] terrainMap, int dimension)
     {
         Mesh mesh = new Mesh();

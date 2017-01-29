@@ -17,12 +17,36 @@ public class CityGenerator : MonoBehaviour
     public int terrainGeneratorSeed;
     public AgentConfiguration[] agentsList;
     public int meshDimension;
+    public float[,] terrainMap;
+    public float waterlineHeight;
+    public float maximumSlope;
+
+    public float getPointHeight(float x, float y)
+    {
+        int x_i = (int)x;
+        int y_i = (int)y;
+        if (x_i >= meshDimension - 1)
+            x_i = meshDimension - 2;
+        if (y_i >= meshDimension - 1)
+            y_i = meshDimension - 2;
+        if (x_i < 0)
+            x_i = 0;
+        if (y_i < 0)
+            y_i = 0;
+        float h0 = terrainGenerator.meshGenerator.getPointHeight(x_i, y_i, meshDimension, terrainMap);
+        float h1 = terrainGenerator.meshGenerator.getPointHeight(x_i + 1, y_i, meshDimension, terrainMap);
+        float h2 = terrainGenerator.meshGenerator.getPointHeight(x_i, y_i + 1, meshDimension, terrainMap);
+        float h3 = terrainGenerator.meshGenerator.getPointHeight(x_i + 1, y_i + 1, meshDimension, terrainMap);
+        h0 = MathHelper.lerp(h0, h1, x - x_i);
+        h2 = MathHelper.lerp(h2, h3, x - x_i);
+        return MathHelper.lerp(h0, h2, y - y_i);
+    }
 
     // Use this for initialization
     void Start()
     {
         System.DateTime t1 = System.DateTime.Now;
-        float[,] terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
+        terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
         roadNetwork = new RoadNetwork();
         System.DateTime t2 = System.DateTime.Now;
 
@@ -36,13 +60,24 @@ public class CityGenerator : MonoBehaviour
         }
         System.DateTime t3 = System.DateTime.Now;
         roadMeshGenerator.terrainMeshGenerator = terrainGenerator.meshGenerator;
-        roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, terrainMap, meshDimension);
+        roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, this);
         System.DateTime t4 = System.DateTime.Now;
         Debug.Log("Terrain generation time: " + (t2 - t1).ToString());
         Debug.Log("Agents processing time: " + (t3 - t2).ToString());
         Debug.Log("Roads generation time: " + (t4 - t3).ToString());
         Debug.Log("Road segments: " + roadNetwork.roadSegments.Count);
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
+        float minSlope = float.MaxValue, maxSlope = float.MinValue;
+        foreach (RoadSegment segment in roadNetwork.roadSegments)
+        {
+            float slope = RoadHelper.getSegmentSlope(segment.start, segment.end, this);
+            if (minSlope > slope)
+                minSlope = slope;
+            if (maxSlope < slope)
+                maxSlope = slope;
+        }
+        Debug.Log("Minimum Slope = " + minSlope.ToString());
+        Debug.Log("Maximum Slope = " + maxSlope.ToString());
     }
 
     // Update is called once per frame

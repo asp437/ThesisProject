@@ -10,27 +10,6 @@ public class RoadMeshGenerator : MonoBehaviour
     private const float heightScale = 0.005f;
     public TerrainMeshGenerator terrainMeshGenerator;
 
-    protected float getPointHeight(float x, float y, int dimension, float[,] terrainMap)
-    {
-        int x_i = (int)x;
-        int y_i = (int)y;
-        if (x_i >= dimension - 1)
-            x_i = dimension - 2;
-        if (y_i >= dimension - 1)
-            y_i = dimension - 2;
-        if (x_i < 0)
-            x_i = 0;
-        if (y_i < 0)
-            y_i = 0;
-        float h0 = terrainMeshGenerator.getPointHeight(x_i, y_i, dimension, terrainMap) + 1.0f * heightScale;
-        float h1 = terrainMeshGenerator.getPointHeight(x_i + 1, y_i, dimension, terrainMap) + 1.0f * heightScale;
-        float h2 = terrainMeshGenerator.getPointHeight(x_i, y_i + 1, dimension, terrainMap) + 1.0f * heightScale;
-        float h3 = terrainMeshGenerator.getPointHeight(x_i + 1, y_i + 1, dimension, terrainMap) + 1.0f * heightScale;
-        h0 = MathHelper.lerp(h0, h1, x - x_i);
-        h2 = MathHelper.lerp(h2, h3, x - x_i);
-        return MathHelper.lerp(h0, h2, y - y_i);
-    }
-
     protected void connectClosest(List<Vector3> vertices, List<int> indices, int s, int e)
     {
         List<Vector3> sVertices = new List<Vector3>();
@@ -84,7 +63,7 @@ public class RoadMeshGenerator : MonoBehaviour
         indices.Add(verticesPerCross * e + closest1);
     }
 
-    public void generateMesh(GameObject gameObject, RoadNetwork roadNetwork, float[,] terrainMap, int dimension)
+    public void generateMesh(GameObject gameObject, RoadNetwork roadNetwork, CityGenerator cityGenerator)
     {
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>(); // Vertices matrix
@@ -95,19 +74,19 @@ public class RoadMeshGenerator : MonoBehaviour
             Vector3 v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
             v0.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
             v0.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
-            v0.y = getPointHeight(v0.x, v0.z, dimension, terrainMap);
+            v0.y = cityGenerator.getPointHeight(v0.x, v0.z) + 1.0f * heightScale;
 
             v1.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
             v1.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
-            v1.y = getPointHeight(v1.x, v1.z, dimension, terrainMap);
+            v1.y = cityGenerator.getPointHeight(v1.x, v1.z) + 1.0f * heightScale;
 
             v2.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
             v2.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
-            v2.y = getPointHeight(v2.x, v2.z, dimension, terrainMap);
+            v2.y = cityGenerator.getPointHeight(v2.x, v2.z) + 1.0f * heightScale;
 
             v3.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
             v3.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
-            v3.y = getPointHeight(v3.x, v3.z, dimension, terrainMap);
+            v3.y = cityGenerator.getPointHeight(v3.x, v3.z) + 1.0f * heightScale;
 
             vertices.Add(v0);
             vertices.Add(v1);
