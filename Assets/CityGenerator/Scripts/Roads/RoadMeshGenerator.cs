@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class RoadMeshGenerator : MonoBehaviour
 {
-    public const float scaleMultiplier = 0.015f;
+    public const float scaleMultiplier = 0.05f;
     public Material roadMaterial;
     private const int verticesPerCross = 4;
     private const float heightScale = 0.005f;
@@ -89,12 +89,10 @@ public class RoadMeshGenerator : MonoBehaviour
         Mesh mesh = new Mesh();
         List<Vector3> vertices = new List<Vector3>(); // Vertices matrix
         List<int> indices = new List<int>();
-        float halfLength = dimension / 2.0f;
 
         for (int i = 0; i < roadNetwork.crossroads.Count; i++)
         {
             Vector3 v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
-            float z = getPointHeight(roadNetwork.crossroads[i].x, roadNetwork.crossroads[i].y, dimension, terrainMap);
             v0.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
             v0.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
             v0.y = getPointHeight(v0.x, v0.z, dimension, terrainMap);

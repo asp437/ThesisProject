@@ -39,7 +39,6 @@ public class TerrainMeshGenerator : MonoBehaviour
         Vector2[] uvs = new Vector2[dimension * dimension]; // UV texture coordiantes for each vertex
         List<int> indices = new List<int>(); // Indices of each edge
                                              // Generation of vertices matrix
-        float step = terrainMap.GetLength(0) * 1.0f / dimension;
         for (int x = 0; x < dimension; x++)
         {
             // Use filter function in order to generate more feasible terrain

@@ -19,6 +19,22 @@ public class Crossroad
         this.x = x;
         this.y = y;
     }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+
+        Crossroad that = (Crossroad)obj;
+        return that.x == this.x && that.y == this.y && that.adjacentSegemnts.Equals(this.adjacentSegemnts);
+    }
+
+    public override int GetHashCode()
+    {
+        int value = (int)x;
+        value = value * 1337 + (int)y;
+        return value * 1337 + adjacentSegemnts.GetHashCode();
+    }
 }
 
 public class RoadSegment
@@ -30,8 +46,8 @@ public class RoadSegment
 
     public RoadSegment(Crossroad start, Crossroad end)
     {
-        this.start = start;
-        this.end = end;
+        setStart(start);
+        setEnd(end);
         width = 0.5f;
     }
 
@@ -40,12 +56,21 @@ public class RoadSegment
         width = 0.5f;
     }
 
+    ~RoadSegment()
+    {
+        if (start != null)
+            start.adjacentSegemnts.Remove(this);
+        if (end != null)
+            end.adjacentSegemnts.Remove(this);
+    }
+
     public void setStart(Crossroad cr)
     {
         if (start != null)
             start.adjacentSegemnts.Remove(this);
         start = cr;
-        start.adjacentSegemnts.Add(this);
+        if (start != null)
+            start.adjacentSegemnts.Add(this);
     }
 
     public void setEnd(Crossroad cr)
@@ -53,7 +78,25 @@ public class RoadSegment
         if (end != null)
             end.adjacentSegemnts.Remove(this);
         end = cr;
-        end.adjacentSegemnts.Add(this);
+        if (end != null)
+            end.adjacentSegemnts.Add(this);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj == null || GetType() != obj.GetType())
+            return false;
+
+        RoadSegment that = (RoadSegment)obj;
+        return this.end == that.end && this.start == that.start && this.type.Equals(that.type) && this.width.Equals(that.width);
+    }
+
+    public override int GetHashCode()
+    {
+        int value = start.GetHashCode();
+        value = value * 1337 + end.GetHashCode();
+        value = value * 1337 + type;
+        return (int)(value * 1337 + width);
     }
 }
 
