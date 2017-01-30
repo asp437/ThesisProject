@@ -20,6 +20,7 @@ public class CityGenerator : MonoBehaviour
     public float[,] terrainMap;
     public float waterlineHeight;
     public float maximumSlope;
+    public float meshScale = 20.0f;
 
     public float getPointHeight(float x, float y)
     {
@@ -45,6 +46,8 @@ public class CityGenerator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        GameObject crossroads = new GameObject("Crossroads");
+        GameObject segments = new GameObject("Road Segments");
         System.DateTime t1 = System.DateTime.Now;
         terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
         roadNetwork = new RoadNetwork();
@@ -60,7 +63,7 @@ public class CityGenerator : MonoBehaviour
         }
         System.DateTime t3 = System.DateTime.Now;
         roadMeshGenerator.terrainMeshGenerator = terrainGenerator.meshGenerator;
-        roadMeshGenerator.generateMesh(new GameObject(), roadNetwork, this);
+        roadMeshGenerator.generateMesh(crossroads, segments, roadNetwork, this);
         System.DateTime t4 = System.DateTime.Now;
         Debug.Log("Terrain generation time: " + (t2 - t1).ToString());
         Debug.Log("Agents processing time: " + (t3 - t2).ToString());
@@ -78,6 +81,9 @@ public class CityGenerator : MonoBehaviour
         }
         Debug.Log("Minimum Slope = " + minSlope.ToString());
         Debug.Log("Maximum Slope = " + maxSlope.ToString());
+        terrainGenerator.terrainObject.transform.localScale *= meshScale;
+        crossroads.transform.localScale *= meshScale;
+        segments.transform.localScale *= meshScale;
     }
 
     // Update is called once per frame

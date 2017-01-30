@@ -10,7 +10,7 @@ public class RoadMeshGenerator : MonoBehaviour
     private const float heightScale = 0.005f;
     public TerrainMeshGenerator terrainMeshGenerator;
 
-    protected void connectClosest(List<Vector3> vertices, List<int> indices, int s, int e)
+    protected void connectClosest(List<Vector3> vertices, List<Vector2> uvs, List<int> indices, int s, int e)
     {
         List<Vector3> sVertices = new List<Vector3>();
         List<Vector3> eVertices = new List<Vector3>();
@@ -61,13 +61,21 @@ public class RoadMeshGenerator : MonoBehaviour
         indices.Add(verticesPerCross * s + closest2);
         indices.Add(verticesPerCross * e + closest0);
         indices.Add(verticesPerCross * e + closest1);
+        uvs[verticesPerCross * s + closest3] = new Vector2(0.0f, 0.0f);
+        uvs[verticesPerCross * s + closest2] = new Vector2(1.0f, 1.0f);
+        uvs[verticesPerCross * s + closest0] = new Vector2(0.0f, 1.0f);
+        uvs[verticesPerCross * s + closest1] = new Vector2(1.0f, 0.0f);
     }
 
-    public void generateMesh(GameObject gameObject, RoadNetwork roadNetwork, CityGenerator cityGenerator)
+    public void generateMesh(GameObject crossroadsGO, GameObject segmentsGO, RoadNetwork roadNetwork, CityGenerator cityGenerator)
     {
-        Mesh mesh = new Mesh();
-        List<Vector3> vertices = new List<Vector3>(); // Vertices matrix
-        List<int> indices = new List<int>();
+        Mesh crossroadsMesh = new Mesh();
+        Mesh segmentsMesh = new Mesh();
+        List<Vector3> vertices = new List<Vector3>();
+        List<Vector2> crossroadsUVs = new List<Vector2>();
+        List<Vector2> segmentsUVs;
+        List<int> crossroadsIndices = new List<int>();
+        List<int> segmentsIndices = new List<int>();
 
         for (int i = 0; i < roadNetwork.crossroads.Count; i++)
         {
@@ -92,34 +100,63 @@ public class RoadMeshGenerator : MonoBehaviour
             vertices.Add(v1);
             vertices.Add(v2);
             vertices.Add(v3);
-            indices.Add(verticesPerCross * i + 2);
-            indices.Add(verticesPerCross * i + 3);
-            indices.Add(verticesPerCross * i);
-            indices.Add(verticesPerCross * i + 1);
+            crossroadsUVs.Add(new Vector2(0.0f, 0.0f));
+            crossroadsUVs.Add(new Vector2(1.0f, 0.0f));
+            crossroadsUVs.Add(new Vector2(1.0f, 1.0f));
+            crossroadsUVs.Add(new Vector2(0.0f, 1.0f));
+            crossroadsIndices.Add(verticesPerCross * i + 2);
+            crossroadsIndices.Add(verticesPerCross * i + 3);
+            crossroadsIndices.Add(verticesPerCross * i);
+            crossroadsIndices.Add(verticesPerCross * i + 1);
         }
+        segmentsUVs = new List<Vector2>(crossroadsUVs);
         for (int i = 0; i < roadNetwork.roadSegments.Count; i++)
         {
             int s = roadNetwork.crossroads.IndexOf(roadNetwork.roadSegments[i].start);
             int e = roadNetwork.crossroads.IndexOf(roadNetwork.roadSegments[i].end);
-            connectClosest(vertices, indices, s, e);
+            connectClosest(vertices, segmentsUVs, segmentsIndices, s, e);
         }
 
-        mesh.SetVertices(vertices);
-        List<int> reversedIndices = new List<int>(indices);
+        crossroadsMesh.SetVertices(vertices);
+        segmentsMesh.SetVertices(vertices);
+
+        List<int> reversedIndices = new List<int>(crossroadsIndices);
         reversedIndices.Reverse();
-        indices.AddRange(reversedIndices);
-        mesh.SetIndices(indices.ToArray(), MeshTopology.Quads, 0);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
-        if (gameObject.GetComponent<MeshFilter>() == null)
+        crossroadsIndices.AddRange(reversedIndices);
+        reversedIndices = new List<int>(segmentsIndices);
+        reversedIndices.Reverse();
+        segmentsIndices.AddRange(reversedIndices);
+
+        crossroadsMesh.SetIndices(crossroadsIndices.ToArray(), MeshTopology.Quads, 0);
+        crossroadsMesh.RecalculateNormals();
+        crossroadsMesh.RecalculateBounds();
+        crossroadsMesh.SetUVs(0, crossroadsUVs);
+
+        segmentsMesh.SetIndices(segmentsIndices.ToArray(), MeshTopology.Quads, 0);
+        segmentsMesh.RecalculateNormals();
+        segmentsMesh.RecalculateBounds();
+        segmentsMesh.SetUVs(0, segmentsUVs);
+
+        if (crossroadsGO.GetComponent<MeshFilter>() == null)
         {
-            gameObject.AddComponent<MeshFilter>();
+            crossroadsGO.AddComponent<MeshFilter>();
         }
-        if (gameObject.GetComponent<MeshRenderer>() == null)
+        if (crossroadsGO.GetComponent<MeshRenderer>() == null)
         {
-            gameObject.AddComponent<MeshRenderer>();
+            crossroadsGO.AddComponent<MeshRenderer>();
         }
-        ((MeshFilter)(gameObject.GetComponent<MeshFilter>())).mesh = mesh;
-        ((MeshRenderer)(gameObject.GetComponent<MeshRenderer>())).material = roadMaterial;
+        ((MeshFilter)(crossroadsGO.GetComponent<MeshFilter>())).mesh = crossroadsMesh;
+        ((MeshRenderer)(crossroadsGO.GetComponent<MeshRenderer>())).material = roadMaterial;
+
+        if (segmentsGO.GetComponent<MeshFilter>() == null)
+        {
+            segmentsGO.AddComponent<MeshFilter>();
+        }
+        if (segmentsGO.GetComponent<MeshRenderer>() == null)
+        {
+            segmentsGO.AddComponent<MeshRenderer>();
+        }
+        ((MeshFilter)(segmentsGO.GetComponent<MeshFilter>())).mesh = segmentsMesh;
+        ((MeshRenderer)(segmentsGO.GetComponent<MeshRenderer>())).material = roadMaterial;
     }
 }

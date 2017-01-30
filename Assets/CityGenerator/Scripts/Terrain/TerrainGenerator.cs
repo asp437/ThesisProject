@@ -7,7 +7,7 @@ public class TerrainGenerator : MonoBehaviour
     [System.Serializable]
     public struct NoiseConfiguration { public int amplitude; public float frequency; }
 
-    private GameObject terrainObject;
+    public GameObject terrainObject;
     private int[] permutationTable; // Permutation table used for determined pseudorandom values generation
     public TerrainMeshGenerator meshGenerator;
     public int dimension;
@@ -36,7 +36,7 @@ public class TerrainGenerator : MonoBehaviour
         }
         if (terrainObject == null)
         {
-            terrainObject = new GameObject();
+            terrainObject = new GameObject("Terrain");
         }
         float[,] terrainMap = new float[dimension, dimension];
         Random.InitState(seed);
