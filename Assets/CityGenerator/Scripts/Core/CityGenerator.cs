@@ -21,6 +21,7 @@ public class CityGenerator : MonoBehaviour
     public float waterlineHeight;
     public float maximumSlope;
     public float meshScale = 20.0f;
+    public List<District> districtsMap;
 
     public float getPointHeight(float x, float y)
     {
@@ -48,39 +49,35 @@ public class CityGenerator : MonoBehaviour
     {
         GameObject crossroads = new GameObject("Crossroads");
         GameObject segments = new GameObject("Road Segments");
+
         System.DateTime t1 = System.DateTime.Now;
         terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
         roadNetwork = new RoadNetwork();
-        System.DateTime t2 = System.DateTime.Now;
 
+        System.DateTime t2 = System.DateTime.Now;
         for (int i = 0; i < agentsList.Length; i++)
         {
             agentsList[i].agent.generator = this;
             for (int j = 0; j < agentsList[i].runs; j++)
-            {
                 agentsList[i].agent.agentAction();
-            }
         }
+
         System.DateTime t3 = System.DateTime.Now;
         roadMeshGenerator.terrainMeshGenerator = terrainGenerator.meshGenerator;
         roadMeshGenerator.generateMesh(crossroads, segments, roadNetwork, this);
+
         System.DateTime t4 = System.DateTime.Now;
+        districtsMap = DistrictsHelper.createDistrictsMap(roadNetwork, this);
+
+        System.DateTime t5 = System.DateTime.Now;
         Debug.Log("Terrain generation time: " + (t2 - t1).ToString());
         Debug.Log("Agents processing time: " + (t3 - t2).ToString());
         Debug.Log("Roads generation time: " + (t4 - t3).ToString());
+        Debug.Log("Districts creation time: " + (t5 - t4).ToString());
         Debug.Log("Road segments: " + roadNetwork.roadSegments.Count);
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
-        float minSlope = float.MaxValue, maxSlope = float.MinValue;
-        foreach (RoadSegment segment in roadNetwork.roadSegments)
-        {
-            float slope = RoadHelper.getSegmentSlope(segment.start, segment.end, this);
-            if (minSlope > slope)
-                minSlope = slope;
-            if (maxSlope < slope)
-                maxSlope = slope;
-        }
-        Debug.Log("Minimum Slope = " + minSlope.ToString());
-        Debug.Log("Maximum Slope = " + maxSlope.ToString());
+        Debug.Log("Districts: " + districtsMap.Count);
+
         terrainGenerator.terrainObject.transform.localScale *= meshScale;
         crossroads.transform.localScale *= meshScale;
         segments.transform.localScale *= meshScale;

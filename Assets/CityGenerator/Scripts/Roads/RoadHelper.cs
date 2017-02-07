@@ -101,4 +101,10 @@ public class RoadHelper
         float slope = (float)(Math.Atan(Math.Abs(startHeight - endHeight) / segmentLength) * (180.0f / Math.PI));
         return float.IsNaN(slope) ? 0.0f : slope;
     }
+
+    public static bool hasRoadAt(RoadNetwork roadNetwork, float x1, float y1, float x2, float y2)
+    {
+        // TODO: Implement this method
+        return true;
+    }
 }
