@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DistrictsHelper {
+public class DistrictsHelper
+{
     // Vector2 position (in district) describes one cell with size (1, 1) and points to upper left corner.
 
     protected static District detectDistrict(RoadNetwork roadNetwork, float dimension, int startX, int startY, bool[,] visited)
@@ -13,17 +14,27 @@ public class DistrictsHelper {
         while (bfsQueue.Count > 0)
         {
             Vector2 position = bfsQueue.Dequeue();
-            if (position.x < 0 || position.x >= dimension || position.y < 0 || position.y >= dimension)
+            int px = (int)position.x, py = (int)position.y;
+            if (px < 0 || px >= dimension || py < 0 || py >= dimension || visited[px, py])
                 continue;
+
             result.cells.Add(position);
-            visited[(int)position.x, (int)position.y] = true;
-            if (!RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
+            visited[px, py] = true;
+
+            if (px > 0 && !visited[px - 1, py] && 
+                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
                 bfsQueue.Enqueue(new Vector2(position.x - 1, position.y));
-            if (!RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x + 1, position.y)) // Up
+
+            if (py > 0 && !visited[px, py - 1] &&
+                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x + 1, position.y)) // Up
                 bfsQueue.Enqueue(new Vector2(position.x, position.y - 1));
-            if (!RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
+
+            if ((px + 1) < dimension && !visited[px + 1, py] && 
+                !RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
                 bfsQueue.Enqueue(new Vector2(position.x + 1, position.y));
-            if (!RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
+
+            if ((py + 1) < dimension && !visited[px, py + 1] && 
+                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
                 bfsQueue.Enqueue(new Vector2(position.x, position.y + 1));
         }
         return result;
@@ -40,10 +51,17 @@ public class DistrictsHelper {
 
         for (int x = 0; x < dimension; x++)
             for (int y = 0; y < dimension; y++)
-                if (!visited[x,y]) // Ignore visited cells
+                if (!visited[x, y]) // Ignore visited cells
                 {
                     District district = detectDistrict(roadNetwork, dimension, x, y, visited);
-                    result.Add(district);
+                    bool internalDistrict = true;
+                    foreach (Vector2 cell in district.cells)
+                    {
+                        if (cell.x == 0 || cell.x == dimension - 1 || cell.y == 0 || cell.y == dimension - 1)
+                            internalDistrict = false;
+                    }
+                    if (internalDistrict)
+                        result.Add(district);
                 }
 
         return result;

@@ -7,7 +7,6 @@ public class RoadHelper
 {
     public static float crossroadRoadOffset = 0.1f;
 
-
     // Line segment intersection algorithm by Bryce Boe
     // More info: http://bryceboe.com/2006/10/23/line-segment-intersection-algorithm/
     protected static bool ccw(Crossroad A, Crossroad B, Crossroad C)
@@ -104,7 +103,33 @@ public class RoadHelper
 
     public static bool hasRoadAt(RoadNetwork roadNetwork, float x1, float y1, float x2, float y2)
     {
-        // TODO: Implement this method
-        return true;
+        if (x1 > x2)
+        {
+            float tmp = x2;
+            x2 = x1;
+            x1 = tmp;
+        }
+        if (y1 > y2)
+        {
+            float tmp = y2;
+            y2 = y1;
+            y1 = tmp;
+        }
+        foreach (RoadSegment segment in roadNetwork.roadSegments)
+        {
+            if (segment.start.x == segment.end.x && x1 == x2 && x1 == segment.start.x) // Road segment and tested segment are horizontal
+            {
+                if (segment.start.y <= y1 && segment.end.y >= y2 ||
+                    segment.start.y >= y1 && segment.end.y <= y2)
+                    return true;
+            }
+            else if (segment.start.y == segment.end.y && y1 == y2 && y1 == segment.start.y) // Road segment and tested segment are vertical
+            {
+                if (segment.start.x <= x1 && segment.end.x >= x2 ||
+                    segment.start.x >= x1 && segment.end.x <= x2)
+                    return true;
+            }
+        }
+        return false;
     }
 }
