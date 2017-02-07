@@ -110,15 +110,4 @@ public class RoadNetwork
         roadSegments = new List<RoadSegment>();
         crossroads = new List<Crossroad>();
     }
-
-    // Use this for initialization
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }
