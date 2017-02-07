@@ -13,6 +13,7 @@ public class CityGenerator : MonoBehaviour
 {
     public TerrainGenerator terrainGenerator;
     public RoadMeshGenerator roadMeshGenerator;
+    public DistrictMeshGenerator districtMeshGenerator;
     public RoadNetwork roadNetwork;
     public int terrainGeneratorSeed;
     public AgentConfiguration[] agentsList;
@@ -47,8 +48,9 @@ public class CityGenerator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        GameObject crossroads = new GameObject("Crossroads");
-        GameObject segments = new GameObject("Road Segments");
+        GameObject crossroadsGO = new GameObject("Crossroads");
+        GameObject segmentsGO = new GameObject("Road Segments");
+        GameObject districtsGO = new GameObject("Districts");
 
         System.DateTime t1 = System.DateTime.Now;
         terrainMap = terrainGenerator.GenerateTerrain(terrainGeneratorSeed, null, this);
@@ -63,24 +65,25 @@ public class CityGenerator : MonoBehaviour
         }
 
         System.DateTime t3 = System.DateTime.Now;
-        roadMeshGenerator.terrainMeshGenerator = terrainGenerator.meshGenerator;
-        roadMeshGenerator.generateMesh(crossroads, segments, roadNetwork, this);
+        districtsMap = DistrictsHelper.createDistrictsMap(roadNetwork, this);
 
         System.DateTime t4 = System.DateTime.Now;
-        districtsMap = DistrictsHelper.createDistrictsMap(roadNetwork, this);
+        roadMeshGenerator.generateMesh(crossroadsGO, segmentsGO, roadNetwork, this);
+        districtMeshGenerator.generateMesh(districtsGO, districtsMap, this);
 
         System.DateTime t5 = System.DateTime.Now;
         Debug.Log("Terrain generation time: " + (t2 - t1).ToString());
         Debug.Log("Agents processing time: " + (t3 - t2).ToString());
-        Debug.Log("Roads generation time: " + (t4 - t3).ToString());
-        Debug.Log("Districts creation time: " + (t5 - t4).ToString());
+        Debug.Log("Districts creation time: " + (t4 - t3).ToString());
+        Debug.Log("Meshes time: " + (t5 - t4).ToString());
         Debug.Log("Road segments: " + roadNetwork.roadSegments.Count);
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
         Debug.Log("Districts: " + districtsMap.Count);
 
         terrainGenerator.terrainObject.transform.localScale *= meshScale;
-        crossroads.transform.localScale *= meshScale;
-        segments.transform.localScale *= meshScale;
+        crossroadsGO.transform.localScale *= meshScale;
+        segmentsGO.transform.localScale *= meshScale;
+        districtsGO.transform.localScale *= meshScale;
     }
 
     // Update is called once per frame

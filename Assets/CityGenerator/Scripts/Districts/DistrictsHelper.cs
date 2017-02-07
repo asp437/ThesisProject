@@ -15,7 +15,7 @@ public class DistrictsHelper {
             Vector2 position = bfsQueue.Dequeue();
             if (position.x < 0 || position.x >= dimension || position.y < 0 || position.y >= dimension)
                 continue;
-            result.squares.Add(position);
+            result.cells.Add(position);
             visited[(int)position.x, (int)position.y] = true;
             if (!RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
                 bfsQueue.Enqueue(new Vector2(position.x - 1, position.y));

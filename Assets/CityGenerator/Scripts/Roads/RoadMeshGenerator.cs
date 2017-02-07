@@ -9,7 +9,6 @@ public class RoadMeshGenerator : MonoBehaviour
     public Material roadSegmentMaterial;
     private const int verticesPerCross = 4;
     private const float heightScale = 0.005f;
-    public TerrainMeshGenerator terrainMeshGenerator;
 
     protected void connectClosest(List<Vector3> crossroadsVertices, List<Vector3> segmentsVertices, List<Vector2> uvs,
         List<int> indices, int s, int e, CityGenerator cityGenerator)

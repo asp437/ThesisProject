@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class District
 {
-    public List<Vector2> squares;
+    public List<Vector2> cells;
 
     public District()
     {
-        squares = new List<Vector2>();
+        cells = new List<Vector2>();
     }
 
     // TODO: Add some methods???
