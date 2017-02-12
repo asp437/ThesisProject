@@ -18,8 +18,19 @@ public class DistrictsHelper
             if (px < 0 || px >= dimension || py < 0 || py >= dimension || visited[px, py])
                 continue;
 
-            result.cells.Add(position);
+            result.cells.Add(new DistrictCell(position));
             visited[px, py] = true;
+
+            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
+                result.cells[result.cells.Count - 1].edgeLeft = true; // Update attribute for last added element
+            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x + 1, position.y)) // Up
+                result.cells[result.cells.Count - 1].edgeUp = true; // Update attribute for last added element
+            if (RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
+                result.cells[result.cells.Count - 1].edgeRight = true; // Update attribute for last added element
+            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
+                result.cells[result.cells.Count - 1].edgeBottom = true; // Update attribute for last added element
+
+
 
             if (px > 0 && !visited[px - 1, py] && 
                 !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
@@ -55,7 +66,7 @@ public class DistrictsHelper
                 {
                     District district = detectDistrict(roadNetwork, dimension, x, y, visited);
                     bool internalDistrict = true;
-                    foreach (Vector2 cell in district.cells)
+                    foreach (DistrictCell cell in district.cells)
                     {
                         if (cell.x == 0 || cell.x == dimension - 1 || cell.y == 0 || cell.y == dimension - 1)
                             internalDistrict = false;
