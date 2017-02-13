@@ -9,26 +9,50 @@ public struct DistrictBuildingMesh
     public DistrictType type;
 }
 
-
 public class DistrictMeshGenerator : MonoBehaviour
 {
     public Material districtMaterial;
     public float heightScale = 0.005f;
     public float roadEdgeOffset = 0.05f;
-    public DistrictBuildingMesh[] buildingsMeshes;
+    public DistrictBuildingMesh[] residentialBuildings;
+    public DistrictBuildingMesh[] commercialBuildings;
+    public DistrictBuildingMesh[] industrialBuildings;
+    public DistrictBuildingMesh[] recreationalBuildings;
     public bool generateBuildings = true;
+    public bool generatePlanes = true;
+    public Color residentialZoneColor;
+    public Color commercialZoneColor;
+    public Color industrialZoneColor;
+    public Color recreationalZoneColor;
 
     public void generateMesh(GameObject districtsParentGameObject, List<District> districtsMap, CityGenerator generator)
     {
         int districtNumber = 1;
         foreach (District district in districtsMap)
         {
+            Debug.Log("District type: " + district.type.ToString());
             Mesh mesh = new Mesh();
             List<Vector3> vertices = new List<Vector3>();
             List<int> indices = new List<int>();
             GameObject districtGameObject = new GameObject("District #" + districtNumber.ToString());
             districtNumber++;
             districtGameObject.transform.parent = districtsParentGameObject.transform;
+            Color districtColor = new Color();
+            switch (district.type)
+            {
+                case DistrictType.RESIDENTIAL:
+                    districtColor = residentialZoneColor;
+                    break;
+                case DistrictType.INDUSTRIAL:
+                    districtColor = industrialZoneColor;
+                    break;
+                case DistrictType.RECREATIONAL:
+                    districtColor = recreationalZoneColor;
+                    break;
+                case DistrictType.COMMERCIAL:
+                    districtColor = commercialZoneColor;
+                    break;
+            }
             foreach (DistrictCell cell in district.cells)
             {
                 Vector3 ul = new Vector3(cell.x, generator.getPointHeight(cell.x, cell.y) + 1.0f * heightScale, cell.y);
@@ -63,15 +87,36 @@ public class DistrictMeshGenerator : MonoBehaviour
                 {
                     indices.Add(vertices.Count - i);
                 }
-                if (district.type == DistrictType.RESIDENTIAL && generateBuildings)
+                if (generateBuildings)
                 {
                     float maxHeight = 0.0f;
                     maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x, cell.y) + 1.0f * heightScale);
                     maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x + 1, cell.y) + 1.0f * heightScale);
                     maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x + 1, cell.y + 1) + 1.0f * heightScale);
                     maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x, cell.y + 1) + 1.0f * heightScale);
-                    GameObject buildingGameObject = Instantiate(buildingsMeshes[0].prefab, districtGameObject.transform);
-                    buildingGameObject.transform.position = new Vector3(cell.x, maxHeight, cell.y);
+                    GameObject buildingGameObject = null;
+                    if (district.type == DistrictType.RESIDENTIAL && residentialBuildings.Length > 0)
+                    {
+                        int index = (int)Random.Range(0, residentialBuildings.Length - 0.5f);
+                        buildingGameObject = Instantiate(residentialBuildings[index].prefab, districtGameObject.transform);
+                    }
+                    if (district.type == DistrictType.COMMERCIAL && commercialBuildings.Length > 0)
+                    {
+                        int index = (int)Random.Range(0, commercialBuildings.Length - 0.5f);
+                        buildingGameObject = Instantiate(commercialBuildings[index].prefab, districtGameObject.transform);
+                    }
+                    if (district.type == DistrictType.INDUSTRIAL && industrialBuildings.Length > 0)
+                    {
+                        int index = (int)Random.Range(0, industrialBuildings.Length - 0.5f);
+                        buildingGameObject = Instantiate(industrialBuildings[index].prefab, districtGameObject.transform);
+                    }
+                    if (district.type == DistrictType.RECREATIONAL && recreationalBuildings.Length > 0)
+                    {
+                        int index = (int)Random.Range(0, recreationalBuildings.Length - 0.5f);
+                        buildingGameObject = Instantiate(recreationalBuildings[index].prefab, districtGameObject.transform);
+                    }
+                    if (buildingGameObject != null)
+                        buildingGameObject.transform.position = new Vector3(cell.x, maxHeight, cell.y);
                 }
             }
             mesh.SetVertices(vertices);
@@ -84,10 +129,13 @@ public class DistrictMeshGenerator : MonoBehaviour
             {
                 districtGameObject.AddComponent<MeshRenderer>();
             }
-            ((MeshFilter)(districtGameObject.GetComponent<MeshFilter>())).mesh = mesh;
-            Material material = new Material(districtMaterial);
-            material.SetColor("_Color", Random.ColorHSV());
-            ((MeshRenderer)(districtGameObject.GetComponent<MeshRenderer>())).material = material;
+            if (generatePlanes)
+            {
+                ((MeshFilter)(districtGameObject.GetComponent<MeshFilter>())).mesh = mesh;
+                Material material = new Material(districtMaterial);
+                material.SetColor("_Color", districtColor);
+                ((MeshRenderer)(districtGameObject.GetComponent<MeshRenderer>())).material = material;
+            }
         }
     }
 }

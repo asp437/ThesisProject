@@ -56,8 +56,7 @@ public class District
             rand = new System.Random();
 
         cells = new List<DistrictCell>();
-        type = (DistrictType)rand.Next((int)DistrictType.COUNT);
-        Debug.Log("District type: " + type.ToString());
+        type = DistrictType.UNKNOWN;
         edgeTypeLeft = DistrictType.UNKNOWN;
         edgeTypeRight = DistrictType.UNKNOWN;
         edgeTypeUp = DistrictType.UNKNOWN;

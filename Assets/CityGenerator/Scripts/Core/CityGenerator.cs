@@ -23,6 +23,8 @@ public class CityGenerator : MonoBehaviour
     public float maximumSlope;
     public float meshScale = 20.0f;
     public List<District> districtsMap;
+    public Vector2 cityCenter;
+    public float cityRadius;
 
     public float getPointHeight(float x, float y)
     {
@@ -65,8 +67,6 @@ public class CityGenerator : MonoBehaviour
         }
 
         System.DateTime t3 = System.DateTime.Now;
-        districtsMap = DistrictsHelper.createDistrictsMap(roadNetwork, this);
-
         System.DateTime t4 = System.DateTime.Now;
         roadMeshGenerator.generateMesh(crossroadsGO, segmentsGO, roadNetwork, this);
         districtMeshGenerator.generateMesh(districtsGO, districtsMap, this);
@@ -79,6 +79,7 @@ public class CityGenerator : MonoBehaviour
         Debug.Log("Road segments: " + roadNetwork.roadSegments.Count);
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
         Debug.Log("Districts: " + districtsMap.Count);
+        Debug.Log("City Center: " + cityCenter.ToString());
 
         terrainGenerator.terrainObject.transform.localScale *= meshScale;
         crossroadsGO.transform.localScale *= meshScale;

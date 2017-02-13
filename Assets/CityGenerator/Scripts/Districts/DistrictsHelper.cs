@@ -4,77 +4,35 @@ using UnityEngine;
 
 public class DistrictsHelper
 {
-    // Vector2 position (in district) describes one cell with size (1, 1) and points to upper left corner.
-
-    protected static District detectDistrict(RoadNetwork roadNetwork, float dimension, int startX, int startY, bool[,] visited)
+    public static Vector2 getCityCenterPoint(List<District> districtsList, CityGenerator generator)
     {
-        District result = new District();
-        Queue<Vector2> bfsQueue = new Queue<Vector2>();
-        bfsQueue.Enqueue(new Vector2(startX, startY));
-        while (bfsQueue.Count > 0)
+        Vector2 result = new Vector2();
+        int count = 0;
+        foreach (District district in districtsList)
         {
-            Vector2 position = bfsQueue.Dequeue();
-            int px = (int)position.x, py = (int)position.y;
-            if (px < 0 || px >= dimension || py < 0 || py >= dimension || visited[px, py])
-                continue;
-
-            result.cells.Add(new DistrictCell(position));
-            visited[px, py] = true;
-
-            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
-                result.cells[result.cells.Count - 1].edgeLeft = true; // Update attribute for last added element
-            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x + 1, position.y)) // Up
-                result.cells[result.cells.Count - 1].edgeUp = true; // Update attribute for last added element
-            if (RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
-                result.cells[result.cells.Count - 1].edgeRight = true; // Update attribute for last added element
-            if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
-                result.cells[result.cells.Count - 1].edgeBottom = true; // Update attribute for last added element
-
-
-
-            if (px > 0 && !visited[px - 1, py] && 
-                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left
-                bfsQueue.Enqueue(new Vector2(position.x - 1, position.y));
-
-            if (py > 0 && !visited[px, py - 1] &&
-                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x + 1, position.y)) // Up
-                bfsQueue.Enqueue(new Vector2(position.x, position.y - 1));
-
-            if ((px + 1) < dimension && !visited[px + 1, py] && 
-                !RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
-                bfsQueue.Enqueue(new Vector2(position.x + 1, position.y));
-
-            if ((py + 1) < dimension && !visited[px, py + 1] && 
-                !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
-                bfsQueue.Enqueue(new Vector2(position.x, position.y + 1));
+            foreach (DistrictCell cell in district.cells)
+            {
+                count++;
+                result.x += cell.x;
+                result.y += cell.y;
+            }
         }
+        result /= count;
         return result;
     }
 
-    public static List<District> createDistrictsMap(RoadNetwork roadNetwork, CityGenerator generator)
+    public static float getCityRadius(List<District> districtsList, CityGenerator generator)
     {
-        List<District> result = new List<District>();
-        int dimension = generator.meshDimension;
-        bool[,] visited = new bool[dimension, dimension];
-        for (int x = 0; x < dimension; x++)
-            for (int y = 0; y < dimension; y++)
-                visited[x, y] = false;
-
-        for (int x = 0; x < dimension; x++)
-            for (int y = 0; y < dimension; y++)
-                if (!visited[x, y]) // Ignore visited cells
-                {
-                    District district = detectDistrict(roadNetwork, dimension, x, y, visited);
-                    bool internalDistrict = true;
-                    foreach (DistrictCell cell in district.cells)
-                    {
-                        if (cell.x == 0 || cell.x == dimension - 1 || cell.y == 0 || cell.y == dimension - 1)
-                            internalDistrict = false;
-                    }
-                    if (internalDistrict)
-                        result.Add(district);
-                }
-
+        float result = 0.0f;
+        foreach (District district in districtsList)
+        {
+            foreach (DistrictCell cell in district.cells)
+            {
+                float distance = Vector2.Distance(new Vector2(cell.x + 0.5f, cell.y + 0.5f), generator.cityCenter);
+                if (distance > result)
+                    result = distance;
+            }
+        }
         return result;
     }
 }
