@@ -72,7 +72,6 @@ public class DistrictMeshGenerator : MonoBehaviour
                     maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x, cell.y + 1) + 1.0f * heightScale);
                     GameObject buildingGameObject = Instantiate(buildingsMeshes[0].prefab, districtGameObject.transform);
                     buildingGameObject.transform.position = new Vector3(cell.x, maxHeight, cell.y);
-                    buildingGameObject.transform.localScale *= 1.0f / generator.meshScale;
                 }
             }
             mesh.SetVertices(vertices);

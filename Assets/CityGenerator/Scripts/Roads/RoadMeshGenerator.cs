@@ -11,8 +11,10 @@ public class RoadMeshGenerator : MonoBehaviour
     public float heightScale = 0.005f;
 
     protected void connectClosest(List<Vector3> crossroadsVertices, List<Vector3> segmentsVertices, List<Vector2> uvs,
-        List<int> indices, int s, int e, CityGenerator cityGenerator)
+        List<int> indices, RoadSegment segment, CityGenerator cityGenerator, RoadNetwork roadNetwork)
     {
+        int s = roadNetwork.crossroads.IndexOf(segment.start);
+        int e = roadNetwork.crossroads.IndexOf(segment.end);
         List<Vector3> sVertices = new List<Vector3>();
         List<Vector3> eVertices = new List<Vector3>();
         for (int i = 0; i < 4; i++)
@@ -58,55 +60,51 @@ public class RoadMeshGenerator : MonoBehaviour
             }
         }
 
-        //int subsegmentsCount = (int) Mathf.Abs(Vector3.Distance(crossroadsVertices[verticesPerCross * s + closest3],
-        //    crossroadsVertices[verticesPerCross * e + closest1]));
         int subsegmentsCount = 0;
         Vector3 direction = new Vector3();
-        if (crossroadsVertices[verticesPerCross * e + closest0].x - crossroadsVertices[verticesPerCross * s + closest3].x >= 0.9f)
+        if (segment.start.x == segment.end.x)
         {
-            direction = new Vector3(1.0f, 0.0f, 0.0f);
-            subsegmentsCount = (int)(crossroadsVertices[verticesPerCross * e + closest0].x - crossroadsVertices[verticesPerCross * s + closest3].x);
+            subsegmentsCount = (int)Mathf.Abs(segment.start.y - segment.end.y);
+            direction = new Vector3(0.0f, 0.0f, (segment.start.y - segment.end.y) < 0 ? 1.0f : -1.0f);
         }
-        else if (crossroadsVertices[verticesPerCross * e + closest0].x - crossroadsVertices[verticesPerCross * s + closest3].x <= -0.9f)
+        else
         {
-            direction = new Vector3(-1.0f, 0.0f, 0.0f);
-            subsegmentsCount = -(int)(crossroadsVertices[verticesPerCross * e + closest0].x - crossroadsVertices[verticesPerCross * s + closest3].x);
-        }
-        else if (crossroadsVertices[verticesPerCross * e + closest0].y - crossroadsVertices[verticesPerCross * s + closest3].y >= 0.9f)
-        {
-            direction = new Vector3(0.0f, 1.0f, 0.0f);
-            subsegmentsCount = (int)(crossroadsVertices[verticesPerCross * e + closest0].y - crossroadsVertices[verticesPerCross * s + closest3].y);
-        }
-        else if (crossroadsVertices[verticesPerCross * e + closest0].y - crossroadsVertices[verticesPerCross * s + closest3].y <= -0.9f)
-        {
-            direction = new Vector3(0.0f, -1.0f, 0.0f);
-            subsegmentsCount = -(int)(crossroadsVertices[verticesPerCross * e + closest0].y - crossroadsVertices[verticesPerCross * s + closest3].y);
+            subsegmentsCount = (int)Mathf.Abs(segment.start.x - segment.end.x);
+            direction = new Vector3((segment.start.x - segment.end.x) < 0 ? 1.0f : -1.0f, 0.0f, 0.0f);
         }
 
         int subsegment;
         Vector3 vector;
-        for (subsegment = 0; subsegment < subsegmentsCount; subsegment++)
+        Vector3 offsetCorrection = -direction * widthScale;
+        for (subsegment = 0; subsegment < subsegmentsCount - 1; subsegment++)
         {
             vector = crossroadsVertices[verticesPerCross * s + closest3] + direction * subsegment;
+            if (subsegment != 0)
+                vector += offsetCorrection;
             vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
             segmentsVertices.Add(vector);
 
             vector = crossroadsVertices[verticesPerCross * s + closest2] + direction * subsegment;
+            if (subsegment != 0)
+                vector += offsetCorrection;
             vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
             segmentsVertices.Add(vector);
 
-            vector = crossroadsVertices[verticesPerCross * s + closest3] + direction * (subsegment + 1);
+            vector = crossroadsVertices[verticesPerCross * s + closest2] + direction * (subsegment + 1) + offsetCorrection;
             vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
             segmentsVertices.Add(vector);
 
-            vector = crossroadsVertices[verticesPerCross * s + closest2] + direction * (subsegment + 1);
+            vector = crossroadsVertices[verticesPerCross * s + closest3] + direction * (subsegment + 1) + offsetCorrection;
             vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
             segmentsVertices.Add(vector);
 
             indices.Add(segmentsVertices.Count - 4);
             indices.Add(segmentsVertices.Count - 3);
-            indices.Add(segmentsVertices.Count - 2);
             indices.Add(segmentsVertices.Count - 1);
+
+            indices.Add(segmentsVertices.Count - 1);
+            indices.Add(segmentsVertices.Count - 3);
+            indices.Add(segmentsVertices.Count - 2);
 
             uvs.Add(new Vector2(0.0f, 0.0f));
             uvs.Add(new Vector2(0.0f, 1.0f));
@@ -115,20 +113,27 @@ public class RoadMeshGenerator : MonoBehaviour
         }
 
         vector = crossroadsVertices[verticesPerCross * s + closest3] + direction * subsegment;
+        if (subsegment != 0)
+            vector += offsetCorrection;
         vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
         segmentsVertices.Add(vector);
 
         vector = crossroadsVertices[verticesPerCross * s + closest2] + direction * subsegment;
+        if (subsegment != 0)
+            vector += offsetCorrection;
         vector.y = cityGenerator.getPointHeight(vector.x, vector.z) + 1.0f * heightScale;
         segmentsVertices.Add(vector);
 
         segmentsVertices.Add(crossroadsVertices[verticesPerCross * e + closest0]);
         segmentsVertices.Add(crossroadsVertices[verticesPerCross * e + closest1]);
-        
+
         indices.Add(segmentsVertices.Count - 4);
         indices.Add(segmentsVertices.Count - 3);
-        indices.Add(segmentsVertices.Count - 2);
         indices.Add(segmentsVertices.Count - 1);
+
+        indices.Add(segmentsVertices.Count - 1);
+        indices.Add(segmentsVertices.Count - 3);
+        indices.Add(segmentsVertices.Count - 2);
 
         uvs.Add(new Vector2(0.0f, 0.0f));
         uvs.Add(new Vector2(0.0f, 1.0f));
@@ -145,22 +150,15 @@ public class RoadMeshGenerator : MonoBehaviour
         List<Vector3> vertices = new List<Vector3>();
 
         for (int i = 0; i < roadNetwork.roadSegments.Count; i++)
-        {
-            int s = roadNetwork.crossroads.IndexOf(roadNetwork.roadSegments[i].start);
-            int e = roadNetwork.crossroads.IndexOf(roadNetwork.roadSegments[i].end);
-            connectClosest(crossroadsVertices, vertices, segmentsUVs, segmentsIndices, s, e, cityGenerator);
-        }
+            connectClosest(crossroadsVertices, vertices, segmentsUVs, segmentsIndices, roadNetwork.roadSegments[i], cityGenerator, roadNetwork);
 
         segmentsMesh.SetVertices(vertices);
         List<int> reversedIndices = new List<int>(segmentsIndices);
         reversedIndices.Reverse();
         segmentsIndices.AddRange(reversedIndices);
 
-        segmentsMesh.SetIndices(segmentsIndices.ToArray(), MeshTopology.Quads, 0);
-        segmentsMesh.RecalculateNormals();
-        segmentsMesh.RecalculateBounds();
         segmentsMesh.SetUVs(0, segmentsUVs);
-
+        segmentsMesh.SetIndices(segmentsIndices.ToArray(), MeshTopology.Triangles, 0);
 
         if (segmentsGO.GetComponent<MeshFilter>() == null)
         {
@@ -170,6 +168,11 @@ public class RoadMeshGenerator : MonoBehaviour
         {
             segmentsGO.AddComponent<MeshRenderer>();
         }
+        if (segmentsGO.GetComponent<MeshCollider>() == null)
+        {
+            segmentsGO.AddComponent<MeshCollider>();
+        }
+        ((MeshCollider)(segmentsGO.GetComponent<MeshCollider>())).sharedMesh = segmentsMesh;
         ((MeshFilter)(segmentsGO.GetComponent<MeshFilter>())).mesh = segmentsMesh;
         ((MeshRenderer)(segmentsGO.GetComponent<MeshRenderer>())).material = roadSegmentMaterial;
     }
@@ -208,10 +211,13 @@ public class RoadMeshGenerator : MonoBehaviour
             crossroadsUVs.Add(new Vector2(1.0f, 0.0f));
             crossroadsUVs.Add(new Vector2(1.0f, 1.0f));
             crossroadsUVs.Add(new Vector2(0.0f, 1.0f));
-            crossroadsIndices.Add(verticesPerCross * i + 2);
-            crossroadsIndices.Add(verticesPerCross * i + 3);
             crossroadsIndices.Add(verticesPerCross * i);
             crossroadsIndices.Add(verticesPerCross * i + 1);
+            crossroadsIndices.Add(verticesPerCross * i + 3);
+
+            crossroadsIndices.Add(verticesPerCross * i + 3);
+            crossroadsIndices.Add(verticesPerCross * i + 1);
+            crossroadsIndices.Add(verticesPerCross * i + 2);
         }
 
         crossroadsMesh.SetVertices(vertices);
@@ -220,9 +226,7 @@ public class RoadMeshGenerator : MonoBehaviour
         reversedIndices.Reverse();
         crossroadsIndices.AddRange(reversedIndices);
 
-        crossroadsMesh.SetIndices(crossroadsIndices.ToArray(), MeshTopology.Quads, 0);
-        crossroadsMesh.RecalculateNormals();
-        crossroadsMesh.RecalculateBounds();
+        crossroadsMesh.SetIndices(crossroadsIndices.ToArray(), MeshTopology.Triangles, 0);
         crossroadsMesh.SetUVs(0, crossroadsUVs);
 
         if (crossroadsGO.GetComponent<MeshFilter>() == null)
@@ -233,6 +237,11 @@ public class RoadMeshGenerator : MonoBehaviour
         {
             crossroadsGO.AddComponent<MeshRenderer>();
         }
+        if (crossroadsGO.GetComponent<MeshCollider>() == null)
+        {
+            crossroadsGO.AddComponent<MeshCollider>();
+        }
+        ((MeshCollider)(crossroadsGO.GetComponent<MeshCollider>())).sharedMesh = crossroadsMesh;
         ((MeshFilter)(crossroadsGO.GetComponent<MeshFilter>())).mesh = crossroadsMesh;
         ((MeshRenderer)(crossroadsGO.GetComponent<MeshRenderer>())).material = crossroadMaterial;
         generateSegmentsMesh(vertices, segmentsGO, roadNetwork, cityGenerator);
