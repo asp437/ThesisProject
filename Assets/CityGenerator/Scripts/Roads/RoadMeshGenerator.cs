@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class RoadMeshGenerator : MonoBehaviour
 {
-    public const float scaleMultiplier = 0.05f;
+    public float widthScale = 0.05f;
     public Material crossroadMaterial;
     public Material roadSegmentMaterial;
     private const int verticesPerCross = 4;
@@ -184,20 +184,20 @@ public class RoadMeshGenerator : MonoBehaviour
         for (int i = 0; i < roadNetwork.crossroads.Count; i++)
         {
             Vector3 v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3();
-            v0.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
-            v0.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
+            v0.x = roadNetwork.crossroads[i].x - 1 * widthScale;
+            v0.z = roadNetwork.crossroads[i].y - 1 * widthScale;
             v0.y = cityGenerator.getPointHeight(v0.x, v0.z) + 1.0f * heightScale;
 
-            v1.x = roadNetwork.crossroads[i].x - 1 * scaleMultiplier;
-            v1.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
+            v1.x = roadNetwork.crossroads[i].x - 1 * widthScale;
+            v1.z = roadNetwork.crossroads[i].y + 1 * widthScale;
             v1.y = cityGenerator.getPointHeight(v1.x, v1.z) + 1.0f * heightScale;
 
-            v2.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
-            v2.z = roadNetwork.crossroads[i].y + 1 * scaleMultiplier;
+            v2.x = roadNetwork.crossroads[i].x + 1 * widthScale;
+            v2.z = roadNetwork.crossroads[i].y + 1 * widthScale;
             v2.y = cityGenerator.getPointHeight(v2.x, v2.z) + 1.0f * heightScale;
 
-            v3.x = roadNetwork.crossroads[i].x + 1 * scaleMultiplier;
-            v3.z = roadNetwork.crossroads[i].y - 1 * scaleMultiplier;
+            v3.x = roadNetwork.crossroads[i].x + 1 * widthScale;
+            v3.z = roadNetwork.crossroads[i].y - 1 * widthScale;
             v3.y = cityGenerator.getPointHeight(v3.x, v3.z) + 1.0f * heightScale;
 
             vertices.Add(v0);

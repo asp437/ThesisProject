@@ -2,11 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct DistrictBuildingMesh
+{
+    public GameObject prefab;
+    public DistrictType type;
+}
+
+
 public class DistrictMeshGenerator : MonoBehaviour
 {
     public Material districtMaterial;
     public float heightScale = 0.005f;
     public float roadEdgeOffset = 0.05f;
+    public DistrictBuildingMesh[] buildingsMeshes;
+    public bool generateBuildings = true;
 
     public void generateMesh(GameObject districtsParentGameObject, List<District> districtsMap, CityGenerator generator)
     {
@@ -52,6 +62,17 @@ public class DistrictMeshGenerator : MonoBehaviour
                 for (int i = 1; i <= 4; i++)
                 {
                     indices.Add(vertices.Count - i);
+                }
+                if (district.type == DistrictType.RESIDENTIAL && generateBuildings)
+                {
+                    float maxHeight = 0.0f;
+                    maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x, cell.y) + 1.0f * heightScale);
+                    maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x + 1, cell.y) + 1.0f * heightScale);
+                    maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x + 1, cell.y + 1) + 1.0f * heightScale);
+                    maxHeight = Mathf.Max(maxHeight, generator.getPointHeight(cell.x, cell.y + 1) + 1.0f * heightScale);
+                    GameObject buildingGameObject = Instantiate(buildingsMeshes[0].prefab, districtGameObject.transform);
+                    buildingGameObject.transform.position = new Vector3(cell.x, maxHeight, cell.y);
+                    buildingGameObject.transform.localScale *= 1.0f / generator.meshScale;
                 }
             }
             mesh.SetVertices(vertices);
