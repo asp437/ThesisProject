@@ -56,10 +56,34 @@ public class District
             rand = new System.Random();
 
         cells = new List<DistrictCell>();
-        type = DistrictType.UNKNOWN;
+        type = DistrictType.RESIDENTIAL;
         edgeTypeLeft = DistrictType.UNKNOWN;
         edgeTypeRight = DistrictType.UNKNOWN;
         edgeTypeUp = DistrictType.UNKNOWN;
         edgeTypeBottom = DistrictType.UNKNOWN;
+    }
+
+    public float getDistanceTo(District another, RoadNetwork roadNetwork)
+    {
+        // TODO: Distance via roads
+        Vector2 thisPosition = new Vector2();
+        foreach (DistrictCell cell in cells)
+        {
+            thisPosition.x += cell.x;
+            thisPosition.y += cell.y;
+        }
+        thisPosition.x /= cells.Count;
+        thisPosition.y /= cells.Count;
+
+        Vector2 anotherPosition = new Vector2();
+        foreach (DistrictCell cell in another.cells)
+        {
+            anotherPosition.x += cell.x;
+            anotherPosition.y += cell.y;
+        }
+        anotherPosition.x /= cells.Count;
+        anotherPosition.y /= cells.Count;
+
+        return Vector2.Distance(thisPosition, anotherPosition);
     }
 }

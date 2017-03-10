@@ -35,4 +35,58 @@ public class DistrictsHelper
         }
         return result;
     }
+
+    public static float getCommercialDistrictsMinimumDistance(CityGenerator generator)
+    {
+        float result = float.MaxValue;
+        List<District> commercialDistricts = new List<District>();
+        foreach (District district in generator.districtsMap)
+        {
+            if (district.type == DistrictType.COMMERCIAL)
+                commercialDistricts.Add(district);
+        }
+
+        foreach (District district in commercialDistricts)
+        {
+            foreach (District comDistrict in commercialDistricts)
+            {
+                if (district == comDistrict)
+                    continue;
+                float distance = district.getDistanceTo(comDistrict, generator.roadNetwork);
+                if (distance < result)
+                    result = distance;
+            }
+        }
+        return result;
+    }
+
+    public static float getCommercialDistrictsMaximumDistance(CityGenerator generator)
+    {
+        float result = float.MinValue;
+        List<District> commercialDistricts = new List<District>();
+        foreach (District district in generator.districtsMap)
+        {
+            if (district.type == DistrictType.COMMERCIAL)
+                commercialDistricts.Add(district);
+        }
+
+        foreach (District district in generator.districtsMap)
+        {
+            if (district.type != DistrictType.RESIDENTIAL)
+                continue;
+
+            float minDistance = float.MaxValue;
+            foreach (District comDistrict in commercialDistricts)
+            {
+                float distance = district.getDistanceTo(comDistrict, generator.roadNetwork);
+                if (distance < minDistance)
+                    minDistance = distance;
+            }
+
+            if (minDistance > result)
+                result = minDistance;
+        }
+
+        return result;
+    }
 }

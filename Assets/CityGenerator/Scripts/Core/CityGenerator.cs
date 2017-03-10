@@ -80,6 +80,8 @@ public class CityGenerator : MonoBehaviour
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
         Debug.Log("Districts: " + districtsMap.Count);
         Debug.Log("City Center: " + cityCenter.ToString());
+        Debug.Log("Commercial minimal distance: " + DistrictsHelper.getCommercialDistrictsMinimumDistance(this));
+        Debug.Log("Most far commercial distance: " + DistrictsHelper.getCommercialDistrictsMaximumDistance(this));
 
         terrainGenerator.terrainObject.transform.localScale *= meshScale;
         crossroadsGO.transform.localScale *= meshScale;
