@@ -49,6 +49,8 @@ public class District
     public DistrictType edgeTypeUp;
     public DistrictType edgeTypeBottom;
     private static System.Random rand;
+    private HashSet<RoadSegment> relatedRoadSegments;
+    private Dictionary<District, float> distancesCache;
 
     public District()
     {
@@ -61,29 +63,74 @@ public class District
         edgeTypeRight = DistrictType.UNKNOWN;
         edgeTypeUp = DistrictType.UNKNOWN;
         edgeTypeBottom = DistrictType.UNKNOWN;
+        distancesCache = new Dictionary<District, float>();
+        relatedRoadSegments = null;
+}
+
+    public HashSet<RoadSegment> getRelatedRoadSegments(RoadNetwork roadNetwork)
+    {
+        if (relatedRoadSegments == null)
+        {
+            relatedRoadSegments = new HashSet<RoadSegment>();
+            foreach (DistrictCell cell in this.cells)
+            {
+                if (cell.edgeBottom)
+                    relatedRoadSegments.Add(RoadHelper.getRelatedRoadSegment(roadNetwork, cell.x, cell.y + 1, cell.x + 1, cell.y + 1));
+                if (cell.edgeLeft)
+                    relatedRoadSegments.Add(RoadHelper.getRelatedRoadSegment(roadNetwork, cell.x, cell.y, cell.x, cell.y + 1));
+                if (cell.edgeUp)
+                    relatedRoadSegments.Add(RoadHelper.getRelatedRoadSegment(roadNetwork, cell.x, cell.y, cell.x + 1, cell.y));
+                if (cell.edgeRight)
+                    relatedRoadSegments.Add(RoadHelper.getRelatedRoadSegment(roadNetwork, cell.x + 1, cell.y, cell.x + 1, cell.y + 1));
+            }
+        }
+        return relatedRoadSegments;
     }
 
     public float getDistanceTo(District another, RoadNetwork roadNetwork)
     {
-        // TODO: Distance via roads
-        Vector2 thisPosition = new Vector2();
-        foreach (DistrictCell cell in cells)
+        if (!distancesCache.ContainsKey(another))
         {
-            thisPosition.x += cell.x;
-            thisPosition.y += cell.y;
-        }
-        thisPosition.x /= cells.Count;
-        thisPosition.y /= cells.Count;
+            float result = float.MaxValue;
+            HashSet<RoadSegment> roadSegments = this.getRelatedRoadSegments(roadNetwork);
+            HashSet<RoadSegment> anotherRoadSegments = another.getRelatedRoadSegments(roadNetwork);
 
-        Vector2 anotherPosition = new Vector2();
-        foreach (DistrictCell cell in another.cells)
-        {
-            anotherPosition.x += cell.x;
-            anotherPosition.y += cell.y;
+            foreach (RoadSegment segment in roadSegments)
+            {
+                if (segment == null)
+                    continue;
+                foreach (RoadSegment anotherSegment in anotherRoadSegments)
+                {
+                    if (anotherSegment == null)
+                        continue;
+                    float distance = RoadHelper.getDistance(roadNetwork, segment, anotherSegment);
+                    if (distance < result)
+                        result = distance;
+                }
+            }
+            distancesCache[another] = result;
         }
-        anotherPosition.x /= cells.Count;
-        anotherPosition.y /= cells.Count;
 
-        return Vector2.Distance(thisPosition, anotherPosition);
+        return distancesCache[another];
+
+        //Vector2 thisPosition = new Vector2();
+        //foreach (DistrictCell cell in cells)
+        //{
+        //    thisPosition.x += cell.x;
+        //    thisPosition.y += cell.y;
+        //}
+        //thisPosition.x /= cells.Count;
+        //thisPosition.y /= cells.Count;
+
+        //Vector2 anotherPosition = new Vector2();
+        //foreach (DistrictCell cell in another.cells)
+        //{
+        //    anotherPosition.x += cell.x;
+        //    anotherPosition.y += cell.y;
+        //}
+        //anotherPosition.x /= cells.Count;
+        //anotherPosition.y /= cells.Count;
+
+        //return Vector2.Distance(thisPosition, anotherPosition);
     }
 }

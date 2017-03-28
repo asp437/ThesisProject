@@ -26,9 +26,7 @@ public class DistrictsGenerator : AbstractAgent
             if (RoadHelper.hasRoadAt(roadNetwork, position.x + 1, position.y, position.x + 1, position.y + 1)) // Right
                 result.cells[result.cells.Count - 1].edgeRight = true; // Update attribute for last added element
             if (RoadHelper.hasRoadAt(roadNetwork, position.x, position.y + 1, position.x + 1, position.y + 1)) // Down
-                result.cells[result.cells.Count - 1].edgeBottom = true; // Update attribute for last added element
-
-
+                result.cells[result.cells.Count - 1].edgeBottom = true; // Update attribute for last added 
 
             if (px > 0 && !visited[px - 1, py] &&
                 !RoadHelper.hasRoadAt(roadNetwork, position.x, position.y, position.x, position.y + 1)) // Left

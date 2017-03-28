@@ -88,6 +88,7 @@
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RandomRoadSegmentAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadConnectorAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadExtenderAgent.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadOptimizerAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\AbstractAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\CityGenerator.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\MathHelper.cs" />

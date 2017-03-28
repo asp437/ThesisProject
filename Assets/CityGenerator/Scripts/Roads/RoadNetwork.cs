@@ -7,6 +7,7 @@ public class Crossroad
     public List<RoadSegment> adjacentSegemnts;
     public float x;
     public float y;
+    public Dictionary<Crossroad, float> minDistances;
 
     public Crossroad()
     {
@@ -33,14 +34,14 @@ public class Crossroad
     {
         int value = (int)x;
         value = value * 1337 + (int)y;
-        return value * 1337 + adjacentSegemnts.GetHashCode();
+        return value * 1337; // + adjacentSegemnts.GetHashCode();
     }
 }
 
 public class RoadSegment
 {
-    public Crossroad start;
-    public Crossroad end;
+    private Crossroad start;
+    private Crossroad end;
     public int type; // TODO: Create enum with road types
     public float width;
 
@@ -58,10 +59,14 @@ public class RoadSegment
 
     ~RoadSegment()
     {
-        if (start != null)
-            start.adjacentSegemnts.Remove(this);
-        if (end != null)
-            end.adjacentSegemnts.Remove(this);
+        setStart(null);
+        setEnd(null);
+    }
+
+    public float getLength()
+    {
+        float result = Vector2.Distance(new Vector2(start.x, start.y), new Vector2(end.x, end.y));
+        return result;
     }
 
     public void setStart(Crossroad cr)
@@ -80,6 +85,16 @@ public class RoadSegment
         end = cr;
         if (end != null)
             end.adjacentSegemnts.Add(this);
+    }
+
+    public Crossroad getStart()
+    {
+        return start;
+    }
+
+    public Crossroad getEnd()
+    {
+        return end;
     }
 
     public override bool Equals(object obj)

@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Collections;
 
 public class RoadExtenderAgent : AbstractAgent
 {
-    private const float scale = 1.0f;
+    public float minimumSegmentLength = 1.0f;
+    public float maximumSegmentLength = 4.0f;
     public override void agentAction()
     {
         RoadNetwork network = generator.roadNetwork;
@@ -27,11 +29,11 @@ public class RoadExtenderAgent : AbstractAgent
                 direction = new Vector2(-1, 0);
                 break;
         }
-        extension = direction * ((int)Random.Range(1.0f, 4.0f)) * scale;
+        extension = direction * ((int)Random.Range(minimumSegmentLength, maximumSegmentLength));
 
         for (int i = 0; i < extensionOrigin.adjacentSegemnts.Count; i++)
         {
-            Crossroad anotherCr = extensionOrigin.adjacentSegemnts[i].end.Equals(extensionOrigin) ? extensionOrigin.adjacentSegemnts[i].start : extensionOrigin.adjacentSegemnts[i].end;
+            Crossroad anotherCr = extensionOrigin.adjacentSegemnts[i].getEnd().Equals(extensionOrigin) ? extensionOrigin.adjacentSegemnts[i].getStart() : extensionOrigin.adjacentSegemnts[i].getEnd();
             Vector2 v0 = new Vector2(extension.x, extension.y), v1 = new Vector2(anotherCr.x - extensionOrigin.x, anotherCr.y - extensionOrigin.y);
             if (Mathf.Abs(Vector2.Angle(v0, v1)) < 10.0f || Mathf.Abs(Vector2.Angle(v0, v1)) > 350.0f)
                 return;
@@ -42,9 +44,9 @@ public class RoadExtenderAgent : AbstractAgent
         testCr.y = extensionOrigin.y + extension.y;
         for (int i = 0; i < network.roadSegments.Count; i++)
         {
-            if (network.roadSegments[i].start == extensionOrigin || network.roadSegments[i].end == extensionOrigin)
+            if (network.roadSegments[i].getStart() == extensionOrigin || network.roadSegments[i].getEnd() == extensionOrigin)
                 continue;
-            if (RoadHelper.areRoadsIntersects(new RoadSegment(extensionOrigin, testCr), network.roadSegments[i]))
+            if (RoadHelper.areRoadsIntersects(extensionOrigin, testCr, network.roadSegments[i].getStart(), network.roadSegments[i].getEnd(), network.roadSegments[i].width))
                 return;
         }
 
@@ -56,46 +58,53 @@ public class RoadExtenderAgent : AbstractAgent
         network.crossroads.Add(cr1);
         segment = new RoadSegment(extensionOrigin, cr1);
         network.roadSegments.Add(segment);
-        // return;
         testCr = new Crossroad();
         testCr.x = cr1.x + direction.x * 5;
         testCr.y = cr1.y + direction.y * 5;
-        segment = new RoadSegment(cr1, testCr);
-
+        
+        List<KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>>> intersections = new List<KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>>>();
         for (int i = 0; i < network.roadSegments.Count; i++)
         {
-            if (RoadHelper.areRoadsIntersects(segment, network.roadSegments[i]))
+            // TODO: Intersect more than one road
+            if (RoadHelper.areRoadsIntersects(cr1, testCr, network.roadSegments[i].getStart(), network.roadSegments[i].getEnd(), network.roadSegments[i].width))
             {
-                if (network.roadSegments[i].start == cr1 || network.roadSegments[i].end == cr1)
+                if (network.roadSegments[i].getStart() == cr1 || network.roadSegments[i].getEnd() == cr1)
                     continue;
 
-                Vector2 segmentAngle = new Vector2(segment.start.x - segment.end.x, segment.start.y - segment.end.y);
-                Vector2 iSegmentAngle = new Vector2(network.roadSegments[i].start.x - network.roadSegments[i].end.x,
-                    network.roadSegments[i].start.y - network.roadSegments[i].end.y);
+                Vector2 segmentAngle = new Vector2(cr1.x - testCr.x, cr1.y - testCr.y);
+                Vector2 iSegmentAngle = new Vector2(network.roadSegments[i].getStart().x - network.roadSegments[i].getEnd().x,
+                    network.roadSegments[i].getStart().y - network.roadSegments[i].getEnd().y);
                 if (Mathf.Abs(Vector2.Angle(segmentAngle, iSegmentAngle)) <= 60.0f || Mathf.Abs(Vector2.Angle(segmentAngle, iSegmentAngle)) >= 300.0f)
                     continue;
 
-                Vector2 intersectionPoint = RoadHelper.getIntersectionPoint(segment.start, segment.end, network.roadSegments[i].start, network.roadSegments[i].end);
+                Vector2 intersectionPoint = RoadHelper.getIntersectionPoint(cr1, testCr, network.roadSegments[i].getStart(), network.roadSegments[i].getEnd());
                 if (intersectionPoint == Vector2.zero)
                     continue;
+                float distance = Vector2.Distance(new Vector2(cr1.x, cr1.y), intersectionPoint);
+                intersections.Add(new KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>>(distance, new KeyValuePair<RoadSegment, Vector2>(network.roadSegments[i], intersectionPoint)));
 
-                testCr = new Crossroad(intersectionPoint.x, intersectionPoint.y);
-                if (RoadHelper.isUnderWaterline(testCr, generator) || RoadHelper.getSegmentSlope(cr1, testCr, generator) >= generator.maximumSlope) //  
-                    return;
-                network.crossroads.Add(testCr);
-                segment = new RoadSegment(cr1, testCr);
-                network.roadSegments.Add(segment);
-                Crossroad intersectedStart = network.roadSegments[i].start;
-                Crossroad intersectedEnd = network.roadSegments[i].end;
-                network.roadSegments[i].setEnd(null);
-                network.roadSegments[i].setStart(null);
-                network.roadSegments.Remove(network.roadSegments[i]);
-                segment = new RoadSegment(intersectedStart, testCr);
-                network.roadSegments.Add(segment);
-                segment = new RoadSegment(testCr, intersectedEnd);
-                network.roadSegments.Add(segment);
-                break;
             }
+        }
+        Crossroad previousCr = cr1;
+        intersections.Sort((a, b) => a.Key.CompareTo(b.Key));
+        foreach (KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>> intersection in intersections)
+        {
+            testCr = new Crossroad(intersection.Value.Value.x, intersection.Value.Value.y);
+            if (RoadHelper.isUnderWaterline(testCr, generator) || RoadHelper.getSegmentSlope(previousCr, testCr, generator) >= generator.maximumSlope) //  
+                continue;
+            network.crossroads.Add(testCr);
+            segment = new RoadSegment(previousCr, testCr);
+            network.roadSegments.Add(segment);
+            Crossroad intersectedStart = intersection.Value.Key.getStart();
+            Crossroad intersectedEnd = intersection.Value.Key.getEnd();
+            intersection.Value.Key.setEnd(null);
+            intersection.Value.Key.setStart(null);
+            network.roadSegments.Remove(intersection.Value.Key);
+            segment = new RoadSegment(intersectedStart, testCr);
+            network.roadSegments.Add(segment);
+            segment = new RoadSegment(testCr, intersectedEnd);
+            network.roadSegments.Add(segment);
+            previousCr = testCr;
         }
     }
 }

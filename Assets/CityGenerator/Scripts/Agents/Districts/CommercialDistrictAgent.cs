@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestCommercialDistrictAgent : AbstractAgent
+public class CommercialDistrictAgent : AbstractAgent
 {
     public float probability;
     public float minimumDistance = 5;

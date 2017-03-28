@@ -13,8 +13,8 @@ public class RoadMeshGenerator : MonoBehaviour
     protected void connectClosest(List<Vector3> crossroadsVertices, List<Vector3> segmentsVertices, List<Vector2> uvs,
         List<int> indices, RoadSegment segment, CityGenerator cityGenerator, RoadNetwork roadNetwork)
     {
-        int s = roadNetwork.crossroads.IndexOf(segment.start);
-        int e = roadNetwork.crossroads.IndexOf(segment.end);
+        int s = roadNetwork.crossroads.IndexOf(segment.getStart());
+        int e = roadNetwork.crossroads.IndexOf(segment.getEnd());
         List<Vector3> sVertices = new List<Vector3>();
         List<Vector3> eVertices = new List<Vector3>();
         for (int i = 0; i < 4; i++)
@@ -62,15 +62,15 @@ public class RoadMeshGenerator : MonoBehaviour
 
         int subsegmentsCount = 0;
         Vector3 direction = new Vector3();
-        if (segment.start.x == segment.end.x)
+        if (segment.getStart().x == segment.getEnd().x)
         {
-            subsegmentsCount = (int)Mathf.Abs(segment.start.y - segment.end.y);
-            direction = new Vector3(0.0f, 0.0f, (segment.start.y - segment.end.y) < 0 ? 1.0f : -1.0f);
+            subsegmentsCount = (int)Mathf.Abs(segment.getStart().y - segment.getEnd().y);
+            direction = new Vector3(0.0f, 0.0f, (segment.getStart().y - segment.getEnd().y) < 0 ? 1.0f : -1.0f);
         }
         else
         {
-            subsegmentsCount = (int)Mathf.Abs(segment.start.x - segment.end.x);
-            direction = new Vector3((segment.start.x - segment.end.x) < 0 ? 1.0f : -1.0f, 0.0f, 0.0f);
+            subsegmentsCount = (int)Mathf.Abs(segment.getStart().x - segment.getEnd().x);
+            direction = new Vector3((segment.getStart().x - segment.getEnd().x) < 0 ? 1.0f : -1.0f, 0.0f, 0.0f);
         }
 
         int subsegment;
