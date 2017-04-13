@@ -7,6 +7,7 @@ public struct AgentConfiguration
 {
     public AbstractAgent agent;
     public int runs;
+    public bool enable;
 }
 
 public class CityGenerator : MonoBehaviour
@@ -62,20 +63,18 @@ public class CityGenerator : MonoBehaviour
         for (int i = 0; i < agentsList.Length; i++)
         {
             agentsList[i].agent.generator = this;
-            for (int j = 0; j < agentsList[i].runs; j++)
-                agentsList[i].agent.agentAction();
+            if (agentsList[i].enable)
+                for (int j = 0; j < agentsList[i].runs; j++)
+                    agentsList[i].agent.agentAction();
         }
 
         System.DateTime t3 = System.DateTime.Now;
-        System.DateTime t4 = System.DateTime.Now;
         roadMeshGenerator.generateMesh(crossroadsGO, segmentsGO, roadNetwork, this);
         districtMeshGenerator.generateMesh(districtsGO, districtsMap, this);
-
-        System.DateTime t5 = System.DateTime.Now;
+        System.DateTime t4 = System.DateTime.Now;
         Debug.Log("Terrain generation time: " + (t2 - t1).ToString());
         Debug.Log("Agents processing time: " + (t3 - t2).ToString());
-        Debug.Log("Districts creation time: " + (t4 - t3).ToString());
-        Debug.Log("Meshes time: " + (t5 - t4).ToString());
+        Debug.Log("Meshes time: " + (t4 - t3).ToString());
         Debug.Log("Road segments: " + roadNetwork.roadSegments.Count);
         Debug.Log("Crossroads: " + roadNetwork.crossroads.Count);
         Debug.Log("Districts: " + districtsMap.Count);

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CommercialDistrictAgent : AbstractAgent
+public class UniformCommercialDistrictAgent : AbstractAgent
 {
     public float probability;
     public float minimumDistance = 5;
@@ -23,7 +23,7 @@ public class CommercialDistrictAgent : AbstractAgent
                 return;
             float minimumDistancePre = DistrictsHelper.getCommercialDistrictsMinimumDistance(generator);
             float maximumDistancePre = DistrictsHelper.getCommercialDistrictsMaximumDistance(generator);
-            
+
             district.type = DistrictType.COMMERCIAL;
 
             float minimumDistancePost = DistrictsHelper.getCommercialDistrictsMinimumDistance(generator);

@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class IndustrialSuburbsAgent : AbstractAgent
+public class CityCenterCommercialDistrictsAgent : AbstractAgent
 {
-    public float radiusMultiplier = 0.9f;
-    public float outOfRadiusProb = 0.5f;
+    public float radiusMultiplier = 0.2f;
+    public float outOfRadiusProb = 0.75f;
     private static List<District> residentialDistricts = null;
 
     private void createResidentialDistrictsList()
@@ -23,18 +22,23 @@ public class IndustrialSuburbsAgent : AbstractAgent
             }
             position /= count;
             float distanceToCenter = Vector2.Distance(position, generator.cityCenter);
-            if (distanceToCenter > generator.cityRadius * radiusMultiplier)
+            if (distanceToCenter < generator.cityRadius * radiusMultiplier)
                 residentialDistricts.Add(district);
         }
     }
+
     public override void agentAction()
     {
         if (residentialDistricts == null)
             createResidentialDistrictsList();
-        if (Random.value < outOfRadiusProb)
+        if (residentialDistricts.Count > 0)
         {
-            if (residentialDistricts.Count > 0)
-                residentialDistricts[(int)Random.Range(0.0f, residentialDistricts.Count - 1)].type = DistrictType.INDUSTRIAL;
+            District selectedDistrict = residentialDistricts[(int)Random.Range(0.0f, residentialDistricts.Count - 1)];
+            if (Random.value < (outOfRadiusProb / selectedDistrict.cells.Count))
+            {
+                selectedDistrict.type = DistrictType.COMMERCIAL;
+                residentialDistricts.Remove(selectedDistrict);
+            }
         }
     }
 }

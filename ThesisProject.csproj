@@ -52,6 +52,9 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Advertisements">
+      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -67,6 +70,9 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>Library\UnityAssemblies\UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.VR">
       <HintPath>Library\UnityAssemblies\UnityEngine.VR.dll</HintPath>
     </Reference>
@@ -81,15 +87,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\CommercialDistrictAgent.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\CityCenterCommercialDistrictsAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\DistrictsGenerator.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\IndustrialSuburbsAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\IndustrialThresholdAgent.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Agents\Districts\UniformCommercialDistrictAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RandomRoadSegmentAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadConnectorAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadExtenderAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Agents\Road\RoadOptimizerAgent.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\AbstractAgent.cs" />
+    <Compile Include="Assets\CityGenerator\Scripts\Core\AgentsGroup.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\CityGenerator.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Core\MathHelper.cs" />
     <Compile Include="Assets\CityGenerator\Scripts\Districts\District.cs" />

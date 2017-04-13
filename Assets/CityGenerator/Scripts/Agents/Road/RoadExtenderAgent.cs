@@ -6,10 +6,26 @@ public class RoadExtenderAgent : AbstractAgent
 {
     public float minimumSegmentLength = 1.0f;
     public float maximumSegmentLength = 4.0f;
+    public float extensionLength = 5.0f;
+    public bool denseGenerator = false;
+    public float denseProbability = 0.75f;
+
     public override void agentAction()
     {
         RoadNetwork network = generator.roadNetwork;
         Crossroad extensionOrigin = network.crossroads[Random.Range(0, network.crossroads.Count - 1)];
+        if (denseGenerator && Random.value > denseProbability)
+        {
+            List<Crossroad> candidates = new List<Crossroad>();
+            foreach (Crossroad cr in network.crossroads)
+            {
+                if (cr.adjacentSegemnts.Count > 1 && cr.adjacentSegemnts.Count < 4)
+                    candidates.Add(cr);
+            }
+            if (candidates.Count > 0) { 
+                extensionOrigin = candidates[Random.Range(0, candidates.Count - 1)];
+            }
+        }
         Vector2 extension;
         Vector2 direction;
         RoadSegment segment;
@@ -59,13 +75,12 @@ public class RoadExtenderAgent : AbstractAgent
         segment = new RoadSegment(extensionOrigin, cr1);
         network.roadSegments.Add(segment);
         testCr = new Crossroad();
-        testCr.x = cr1.x + direction.x * 5;
-        testCr.y = cr1.y + direction.y * 5;
+        testCr.x = cr1.x + direction.x * extensionLength;
+        testCr.y = cr1.y + direction.y * extensionLength;
         
         List<KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>>> intersections = new List<KeyValuePair<float, KeyValuePair<RoadSegment, Vector2>>>();
         for (int i = 0; i < network.roadSegments.Count; i++)
         {
-            // TODO: Intersect more than one road
             if (RoadHelper.areRoadsIntersects(cr1, testCr, network.roadSegments[i].getStart(), network.roadSegments[i].getEnd(), network.roadSegments[i].width))
             {
                 if (network.roadSegments[i].getStart() == cr1 || network.roadSegments[i].getEnd() == cr1)

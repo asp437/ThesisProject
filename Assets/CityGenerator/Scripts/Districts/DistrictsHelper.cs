@@ -10,14 +10,15 @@ public class DistrictsHelper
         int count = 0;
         foreach (District district in districtsList)
         {
+            Vector2 districtCenter = new Vector2();
             foreach (DistrictCell cell in district.cells)
             {
-                count++;
-                result.x += cell.x;
-                result.y += cell.y;
+                districtCenter.x += cell.x;
+                districtCenter.y += cell.y;
             }
+            result += districtCenter / district.cells.Count;
         }
-        result /= count;
+        result /= districtsList.Count;
         return result;
     }
 

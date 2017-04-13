@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DistrictsGenerator : AbstractAgent
 {
+    public int maxSize = 20;
+
     protected static District detectDistrict(RoadNetwork roadNetwork, float dimension, int startX, int startY, bool[,] visited)
     {
         District result = new District();
@@ -67,7 +69,7 @@ public class DistrictsGenerator : AbstractAgent
                         if (cell.x == 0 || cell.x == dimension - 1 || cell.y == 0 || cell.y == dimension - 1)
                             internalDistrict = false;
                     }
-                    if (internalDistrict)
+                    if (internalDistrict && district.cells.Count <= maxSize)
                         result.Add(district);
                 }
         generator.districtsMap = result;
