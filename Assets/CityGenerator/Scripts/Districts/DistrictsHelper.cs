@@ -15,6 +15,7 @@ public class DistrictsHelper
             {
                 districtCenter.x += cell.x;
                 districtCenter.y += cell.y;
+                count++;
             }
             result += districtCenter / district.cells.Count;
         }

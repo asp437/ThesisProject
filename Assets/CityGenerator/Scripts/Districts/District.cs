@@ -112,25 +112,28 @@ public class District
         }
 
         return distancesCache[another];
+    }
 
-        //Vector2 thisPosition = new Vector2();
-        //foreach (DistrictCell cell in cells)
-        //{
-        //    thisPosition.x += cell.x;
-        //    thisPosition.y += cell.y;
-        //}
-        //thisPosition.x /= cells.Count;
-        //thisPosition.y /= cells.Count;
+    public float getDistanceToLine(District another, RoadNetwork roadNetwork)
+    {
+        Vector2 thisPosition = new Vector2();
+        foreach (DistrictCell cell in cells)
+        {
+            thisPosition.x += cell.x;
+            thisPosition.y += cell.y;
+        }
+        thisPosition.x /= cells.Count;
+        thisPosition.y /= cells.Count;
 
-        //Vector2 anotherPosition = new Vector2();
-        //foreach (DistrictCell cell in another.cells)
-        //{
-        //    anotherPosition.x += cell.x;
-        //    anotherPosition.y += cell.y;
-        //}
-        //anotherPosition.x /= cells.Count;
-        //anotherPosition.y /= cells.Count;
+        Vector2 anotherPosition = new Vector2();
+        foreach (DistrictCell cell in another.cells)
+        {
+            anotherPosition.x += cell.x;
+            anotherPosition.y += cell.y;
+        }
+        anotherPosition.x /= cells.Count;
+        anotherPosition.y /= cells.Count;
 
-        //return Vector2.Distance(thisPosition, anotherPosition);
+        return Vector2.Distance(thisPosition, anotherPosition);
     }
 }
